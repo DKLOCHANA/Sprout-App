@@ -3,7 +3,7 @@
  * Displays a single memory/achievement in the timeline
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ interface MemoryCardProps {
   isLast?: boolean;
 }
 
-export function MemoryCard({ memory, isFirst, isLast }: MemoryCardProps) {
+function MemoryCardComponent({ memory, isFirst, isLast }: MemoryCardProps) {
   const handleShare = useCallback(async () => {
     try {
       const message = memory.notes
@@ -103,6 +103,9 @@ export function MemoryCard({ memory, isFirst, isLast }: MemoryCardProps) {
     </View>
   );
 }
+
+// Wrap with React.memo for performance in lists
+export const MemoryCard = memo(MemoryCardComponent);
 
 const TIMELINE_DOT_SIZE = 16;
 const TIMELINE_LINE_WIDTH = 3;

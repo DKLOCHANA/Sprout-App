@@ -19,6 +19,7 @@ import {
   Timestamp,
   serverTimestamp,
   writeBatch,
+  FieldValue,
   type FirestoreBaby,
   type FirestoreGrowthEntry,
 } from '../firestore';
@@ -139,8 +140,9 @@ export const babyService = {
     const db = getFirestoreDb();
     const babyRef = doc(db, getUserBabiesPath(userId), babyId);
 
-    const firestoreUpdates: Partial<FirestoreBaby> & { updatedAt: ReturnType<typeof serverTimestamp> } = {
-      updatedAt: serverTimestamp() as any,
+    // Build updates object - serverTimestamp() returns FieldValue
+    const firestoreUpdates: Record<string, unknown> = {
+      updatedAt: serverTimestamp(),
     };
 
     if (updates.name !== undefined) firestoreUpdates.name = updates.name;
@@ -215,8 +217,9 @@ export const babyService = {
     const db = getFirestoreDb();
     const entryRef = doc(db, getBabyGrowthEntriesPath(userId, babyId), entryId);
 
-    const firestoreUpdates: Partial<FirestoreGrowthEntry> & { updatedAt: ReturnType<typeof serverTimestamp> } = {
-      updatedAt: serverTimestamp() as any,
+    // Build updates object - serverTimestamp() returns FieldValue
+    const firestoreUpdates: Record<string, unknown> = {
+      updatedAt: serverTimestamp(),
     };
 
     if (updates.date !== undefined) firestoreUpdates.date = updates.date;

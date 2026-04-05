@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, radii, typography } from '@/core/theme';
+import { colors, spacing, radii, typography, shadows } from '@/core/theme';
 import type { Milestone, MilestoneStatus } from '@/features/milestones/types';
 
 interface UpNextCardProps {
@@ -25,9 +25,9 @@ const STATUS_CONFIG = {
   },
   in_progress: {
     label: 'In Progress',
-    color: '#F5A623',
+    color: colors.statusInProgress,
     icon: 'ellipse' as const,
-    iconColor: '#F5A623',
+    iconColor: colors.statusInProgress,
   },
   achieved: {
     label: 'Achieved',
@@ -81,11 +81,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 8,
+    ...shadows.lg,
   },
   innerClip: {
     borderRadius: radii.xl,

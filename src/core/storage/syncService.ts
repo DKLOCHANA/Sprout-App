@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { babyService, milestoneService, userService } from '@core/firebase';
 import { useBabyStore } from '@features/baby-profile/store';
 import { useMilestoneStore } from '@features/milestones/store';
+import type { Baby, GrowthEntry } from '@features/baby-profile/types';
+import type { MilestoneStatus } from '@features/milestones/types';
 
 const SYNC_QUEUE_KEY = 'sync_queue';
 const LAST_SYNC_KEY = 'last_sync_timestamp';
@@ -25,9 +27,22 @@ interface SyncQueueItem {
   id: string;
   type: SyncOperationType;
   userId: string;
-  payload: Record<string, any>;
+  payload: SyncPayload;
   timestamp: string;
   retryCount: number;
+}
+
+// Type-safe payload interface matching actual API needs
+interface SyncPayload {
+  baby?: Baby;
+  babyId?: string;
+  updates?: Partial<Baby> | Partial<GrowthEntry>;
+  entry?: GrowthEntry;
+  entryId?: string;
+  milestoneId?: string;
+  status?: MilestoneStatus;
+  notes?: string;
+  photoUri?: string;
 }
 
 class SyncService {
@@ -40,7 +55,7 @@ class SyncService {
   async queueOperation(
     type: SyncOperationType,
     userId: string,
-    payload: Record<string, any>
+    payload: SyncPayload
   ): Promise<void> {
     const queue = await this.getQueue();
     const item: SyncQueueItem = {
@@ -120,29 +135,40 @@ class SyncService {
 
     switch (type) {
       case 'create_baby':
+        if (!payload.baby) throw new Error('Missing baby data for create_baby');
         await babyService.createBaby(userId, payload.baby);
         break;
       case 'update_baby':
-        await babyService.updateBaby(userId, payload.babyId, payload.updates);
+        if (!payload.babyId || !payload.updates) throw new Error('Missing babyId or updates for update_baby');
+        await babyService.updateBaby(userId, payload.babyId, payload.updates as Partial<Baby>);
         break;
       case 'delete_baby':
+        if (!payload.babyId) throw new Error('Missing babyId for delete_baby');
         await babyService.deleteBaby(userId, payload.babyId);
         break;
       case 'create_growth_entry':
+        if (!payload.babyId || !payload.entry) throw new Error('Missing babyId or entry for create_growth_entry');
         await babyService.addGrowthEntry(userId, payload.babyId, payload.entry);
         break;
       case 'update_growth_entry':
+        if (!payload.babyId || !payload.entryId || !payload.updates) {
+          throw new Error('Missing babyId, entryId, or updates for update_growth_entry');
+        }
         await babyService.updateGrowthEntry(
           userId,
           payload.babyId,
           payload.entryId,
-          payload.updates
+          payload.updates as Partial<GrowthEntry>
         );
         break;
       case 'delete_growth_entry':
+        if (!payload.babyId || !payload.entryId) throw new Error('Missing babyId or entryId for delete_growth_entry');
         await babyService.deleteGrowthEntry(userId, payload.babyId, payload.entryId);
         break;
       case 'update_milestone':
+        if (!payload.babyId || !payload.milestoneId || !payload.status) {
+          throw new Error('Missing babyId, milestoneId, or status for update_milestone');
+        }
         await milestoneService.updateMilestoneStatus(
           userId,
           payload.babyId,

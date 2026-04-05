@@ -72,6 +72,23 @@ export const colors = {
   // Link
   link: '#4A90D9',
   linkPressed: '#3A7FC9',
+
+  // Growth Percentile Colors
+  percentileVeryLow: '#DC2626',    // red-600 - below 3rd
+  percentileLow: '#F59E0B',        // amber-500 - 3rd-15th
+  percentileNormal: '#10B981',     // emerald-500 - 15th-85th  
+  percentileHigh: '#F59E0B',       // amber-500 - 85th-97th
+  percentileVeryHigh: '#DC2626',   // red-600 - above 97th
+
+  // Chart Colors
+  chartLine: '#E57373',            // Light red for chart lines
+  chartLineSecondary: '#FFB74D',   // Light orange for secondary lines
+  chartReference: '#9E9E9E',       // Gray for reference/legend
+  chartBabyGrowth: '#4A90D9',      // Blue for baby's growth line
+
+  // Status/Progress Colors  
+  statusInProgress: '#F5A623',     // Amber for in-progress state
+  statusPending: '#9E9E9E',        // Gray for pending/not-yet
 } as const;
 
 export type ColorKey = keyof typeof colors;

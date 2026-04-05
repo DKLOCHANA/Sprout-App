@@ -146,7 +146,7 @@ export function ProfileHeader({
           onPress={handleEditPhoto}
           hitSlop={8}
         >
-          <Ionicons name="pencil" size={14} color={colors.textOnPrimary} />
+          <Ionicons name="camera" size={14} color={colors.textOnPrimary} />
         </Pressable>
       </View>
 

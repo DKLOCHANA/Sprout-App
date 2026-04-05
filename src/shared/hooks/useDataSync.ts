@@ -8,7 +8,7 @@ import { AppState, AppStateStatus } from 'react-native';
 import { useAuthStore } from '@features/auth/store';
 import { useBabyStore } from '@features/baby-profile/store';
 import { useMilestoneStore } from '@features/milestones/store';
-import { syncService } from '@core/storage';
+import { syncService } from '@core/storage/syncService';
 
 interface UseDataSyncOptions {
   syncOnMount?: boolean;

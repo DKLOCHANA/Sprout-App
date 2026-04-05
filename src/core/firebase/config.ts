@@ -9,7 +9,8 @@ import {
   getAuth,
   Auth,
 } from 'firebase/auth';
-import * as firebaseAuthModule from 'firebase/auth';
+// @ts-expect-error - Firebase RN persistence import path varies by build
+import { getReactNativePersistence } from '@firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { env } from '@core/config';
 
@@ -30,18 +31,13 @@ export function initializeFirebase(): FirebaseApp {
     firebaseApp = initializeApp(firebaseConfig);
     
     // Initialize Auth with AsyncStorage persistence
-    // Note: getReactNativePersistence might not be available in all Firebase versions
-    // Using default persistence for now
     try {
-      const persistence = (firebaseAuthModule as any).getReactNativePersistence;
-      if (persistence) {
-        firebaseAuth = initializeAuth(firebaseApp, {
-          persistence: persistence(ReactNativeAsyncStorage),
-        });
-      } else {
-        firebaseAuth = getAuth(firebaseApp);
-      }
+      const persistence = getReactNativePersistence(ReactNativeAsyncStorage);
+      firebaseAuth = initializeAuth(firebaseApp, {
+        persistence,
+      });
     } catch {
+      // Fallback if persistence initialization fails
       firebaseAuth = getAuth(firebaseApp);
     }
   }

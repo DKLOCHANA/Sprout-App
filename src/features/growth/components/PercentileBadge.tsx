@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, typography, spacing } from '@/core/theme';
 import { getPercentileCategory, PERCENTILE_RANGES } from '@/features/growth/types/growth.types';
+import type { ColorKey } from '@/core/theme';
 
 interface PercentileBadgeProps {
   percentile: number;
@@ -16,6 +17,10 @@ interface PercentileBadgeProps {
 export function PercentileBadge({ percentile, size = 'medium' }: PercentileBadgeProps) {
   const category = getPercentileCategory(percentile);
   const config = PERCENTILE_RANGES[category];
+  
+  // Get actual color value from theme using the color key
+  const colorKey = config.color as ColorKey;
+  const colorValue = colors[colorKey];
 
   const sizeStyles = {
     small: { paddingHorizontal: spacing.xs, paddingVertical: 4 },
@@ -34,14 +39,14 @@ export function PercentileBadge({ percentile, size = 'medium' }: PercentileBadge
       style={[
         styles.container,
         sizeStyles[size],
-        { backgroundColor: `${config.color}20` },
+        { backgroundColor: `${colorValue}20` }, // 20 = 12.5% opacity in hex
       ]}
     >
       <Text
         style={[
           styles.text,
           textSizeStyles[size],
-          { color: config.color },
+          { color: colorValue },
         ]}
       >
         {Math.round(percentile)}th Percentile

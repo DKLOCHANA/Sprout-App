@@ -58,7 +58,7 @@ export function SettingsRow({
 
       {/* Chevron */}
       {showChevron && (
-        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+        <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
       )}
     </Pressable>
   );

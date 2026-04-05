@@ -100,7 +100,7 @@ export function ImagePicker({
               style={[styles.image, { width: size, height: size, borderRadius: size / 2 }]}
             />
             <View style={styles.editBadge}>
-              <Ionicons name="pencil" size={14} color={colors.textOnPrimary} />
+              <Ionicons name="camera" size={16} color={colors.textOnPrimary} />
             </View>
           </>
         ) : (

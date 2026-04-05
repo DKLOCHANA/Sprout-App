@@ -25,8 +25,8 @@ export function AlertBanner({ alert, onDismiss, compact = false }: AlertBannerPr
     },
     warning: {
       bgColor: colors.warningDim,
-      borderColor: '#F59E0B',
-      iconColor: '#F59E0B',
+      borderColor: colors.percentileLow,
+      iconColor: colors.percentileLow,
       icon: 'alert-circle' as const,
     },
     info: {

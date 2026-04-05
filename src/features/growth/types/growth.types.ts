@@ -176,11 +176,11 @@ export interface GrowthAlert {
  * Percentile ranges for categorization
  */
 export const PERCENTILE_RANGES = {
-  VERY_LOW: { min: 0, max: 3, label: 'Below 3rd', color: '#DC2626' },      // red-600
-  LOW: { min: 3, max: 15, label: '3rd-15th', color: '#F59E0B' },           // amber-500
-  NORMAL: { min: 15, max: 85, label: '15th-85th', color: '#10B981' },      // emerald-500
-  HIGH: { min: 85, max: 97, label: '85th-97th', color: '#F59E0B' },        // amber-500
-  VERY_HIGH: { min: 97, max: 100, label: 'Above 97th', color: '#DC2626' }  // red-600
+  VERY_LOW: { min: 0, max: 3, label: 'Below 3rd', color: 'percentileVeryLow' },
+  LOW: { min: 3, max: 15, label: '3rd-15th', color: 'percentileLow' },
+  NORMAL: { min: 15, max: 85, label: '15th-85th', color: 'percentileNormal' },
+  HIGH: { min: 85, max: 97, label: '85th-97th', color: 'percentileHigh' },
+  VERY_HIGH: { min: 97, max: 100, label: 'Above 97th', color: 'percentileVeryHigh' }
 } as const;
 
 /**

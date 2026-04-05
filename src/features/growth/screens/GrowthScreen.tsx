@@ -9,10 +9,11 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  SafeAreaView,
   StatusBar,
   useWindowDimensions,
+  ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useBabyStore } from '@/features/baby-profile/store';
@@ -23,7 +24,7 @@ import { AlertBanner } from '../components/AlertBanner';
 import { PercentileBadge } from '../components/PercentileBadge';
 import { MetricCard } from '../components/MetricCard';
 import { GrowthEntryModal } from '../components/GrowthEntryModal';
-import { colors, typography, spacing } from '@/core/theme';
+import { colors, typography, spacing, shadows } from '@/core/theme';
 import type { GrowthEntry } from '@/features/baby-profile/types';
 
 export function GrowthScreen() {
@@ -88,7 +89,7 @@ export function GrowthScreen() {
   const activeAlerts = alerts.filter(alert => !alert.dismissed);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
@@ -101,8 +102,12 @@ export function GrowthScreen() {
         </View>
       </View>
 
-      {/* Main Content - No Scroll */}
-      <View style={styles.content}>
+      {/* Scrollable Content */}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Alerts */}
         {activeAlerts.length > 0 && (
           <View style={styles.alertsSection}>
@@ -172,7 +177,7 @@ export function GrowthScreen() {
           </View>
         )}
 
-        {/* Add Entry Button - Fixed at bottom */}
+        {/* Add Entry Button */}
         <View style={styles.addButtonContainer}>
           <Pressable 
             style={styles.addButton}
@@ -181,7 +186,7 @@ export function GrowthScreen() {
             <Text style={styles.addButtonTitle}>New Entry</Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
 
       {/* Growth Entry Modal */}
       <GrowthEntryModal
@@ -204,6 +209,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
   },
   headerLeft: {
     flex: 1,
@@ -237,32 +243,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: spacing.lg,
-    justifyContent: 'center',
+    paddingBottom: spacing.xl,
   },
   alertsSection: {
     marginBottom: spacing.sm,
   },
   chartSection: {
-    flex: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: spacing.md,
+    
   },
   metricsSection: {
     backgroundColor: colors.surface,
     borderRadius: 16,
     padding: spacing.md,
-    marginVertical: spacing.sm,
+    
   },
   metricsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   addButtonContainer: {
-    paddingBottom: spacing.md,
+    paddingTop: spacing.md,
   },
   addButton: {
     width: '100%',
@@ -272,6 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
+    ...shadows.lg,
   },
   addButtonTitle: {
     ...typography.body,
@@ -279,10 +287,8 @@ const styles = StyleSheet.create({
     color: colors.surface,
   },
   noDataSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     paddingVertical: spacing.xl,
+    alignItems: 'center',
   },
   noDataText: {
     ...typography.body,

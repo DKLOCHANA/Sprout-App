@@ -170,26 +170,28 @@ export function getAgeRange(
 /**
  * Validate growth standard dataset structure
  */
-function validateGrowthStandardSet(dataset: any): dataset is GrowthStandardSet {
+function validateGrowthStandardSet(dataset: unknown): dataset is GrowthStandardSet {
   if (!dataset || typeof dataset !== 'object') {
     return false;
   }
 
+  const obj = dataset as Record<string, unknown>;
+
   // Check required fields
   const requiredFields = ['metric', 'sex', 'standard', 'ageRangeMin', 'ageRangeMax', 'unit', 'data'];
   for (const field of requiredFields) {
-    if (!(field in dataset)) {
+    if (!(field in obj)) {
       return false;
     }
   }
 
   // Validate data array
-  if (!Array.isArray(dataset.data) || dataset.data.length === 0) {
+  if (!Array.isArray(obj.data) || obj.data.length === 0) {
     return false;
   }
 
   // Validate first data point structure
-  const firstPoint = dataset.data[0];
+  const firstPoint = obj.data[0] as Record<string, unknown> | undefined;
   if (!firstPoint || typeof firstPoint !== 'object') {
     return false;
   }

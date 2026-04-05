@@ -3,7 +3,7 @@
  * Card component displaying a milestone with status toggles
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii, shadows } from '@/core/theme';
@@ -73,7 +73,7 @@ function StatusButton({ type, isActive, onPress }: StatusButtonProps) {
   );
 }
 
-export function MilestoneCard({
+function MilestoneCardComponent({
   milestone,
   status,
   onStatusChange,
@@ -115,6 +115,9 @@ export function MilestoneCard({
     </View>
   );
 }
+
+// Wrap with React.memo for performance in lists
+export const MilestoneCard = memo(MilestoneCardComponent);
 
 const styles = StyleSheet.create({
   container: {

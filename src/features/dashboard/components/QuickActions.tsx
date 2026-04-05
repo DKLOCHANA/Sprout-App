@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, radii, typography } from '@/core/theme';
+import { colors, spacing, radii, typography, shadows } from '@/core/theme';
 
 interface QuickActionsProps {
   onLogGrowth: () => void;
@@ -62,11 +62,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     borderRadius: radii.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 6,
+    ...shadows.lg,
   },
   gradient: {
     borderRadius: radii.xl,

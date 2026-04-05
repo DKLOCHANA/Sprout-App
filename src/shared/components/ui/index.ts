@@ -11,3 +11,12 @@ export { Toggle } from './Toggle';
 export { Switch } from './Switch';
 export { MeasurementInput } from './MeasurementInput';
 export { ImagePicker } from './ImagePicker';
+export { 
+  Typography, 
+  H1, 
+  H2, 
+  H3, 
+  Body, 
+  BodySmall, 
+  Caption 
+} from './Typography';

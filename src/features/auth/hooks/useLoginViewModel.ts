@@ -6,7 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { signInWithEmail } from '@core/firebase';
-import { syncService } from '@core/storage';
+import { syncService } from '@core/storage/syncService';
 import { useAuthStore } from '../store';
 import { useBabyStore } from '@features/baby-profile/store';
 import { LoginFormData } from '../types';

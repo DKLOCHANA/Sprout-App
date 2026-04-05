@@ -22,6 +22,7 @@ import {
   DocumentSnapshot,
   serverTimestamp,
   writeBatch,
+  FieldValue,
 } from 'firebase/firestore';
 import { getFirebaseApp } from './config';
 
@@ -132,6 +133,7 @@ export {
   Timestamp,
   serverTimestamp,
   writeBatch,
+  FieldValue,
 };
 
 export type {

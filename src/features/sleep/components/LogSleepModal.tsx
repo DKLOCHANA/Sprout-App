@@ -15,7 +15,7 @@ import {
   Platform,
   TextInput,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radii, typography } from '@/core/theme';
 import { useSleep } from '../hooks';
@@ -77,7 +77,7 @@ export function LogSleepModal({ visible, onClose }: LogSleepModalProps) {
     onClose();
   };
 
-  const handleDateChange = (event: any, date?: Date) => {
+  const handleDateChange = (event: DateTimePickerEvent, date?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (date) {
       setSelectedDate(date);

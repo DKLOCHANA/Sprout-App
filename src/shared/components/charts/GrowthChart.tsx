@@ -28,11 +28,11 @@ const PERCENTILE_LINES = [3, 15, 50, 85, 97];
 
 // Colors for percentile lines
 const PERCENTILE_COLORS = {
-  3: '#E57373',    // Light red
-  15: '#FFB74D',   // Light orange
+  3: colors.chartLine,       // Light red
+  15: colors.chartLineSecondary,   // Light orange
   50: colors.primary, // Primary color
-  85: '#FFB74D',   // Light orange  
-  97: '#E57373',   // Light red
+  85: colors.chartLineSecondary,   // Light orange  
+  97: colors.chartLine,   // Light red
 };
 
 export function GrowthChart({ baby, entries, metric, height = 280 }: GrowthChartProps) {
@@ -239,7 +239,7 @@ export function GrowthChart({ baby, entries, metric, height = 280 }: GrowthChart
           <Text style={styles.legendText}>Baby's growth</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#9E9E9E' }]} />
+          <View style={[styles.legendDot, { backgroundColor: colors.chartReference }]} />
           <Text style={styles.legendText}>50th percentile</Text>
         </View>
       </View>

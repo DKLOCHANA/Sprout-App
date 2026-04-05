@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   title: {
     ...typography.caption,
     fontWeight: '600',
-    color: colors.textSecondary,
+    color: colors.secondary,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: spacing.sm,
