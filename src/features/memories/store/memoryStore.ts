@@ -27,6 +27,7 @@ interface MemoryStore {
   updateMemory: (id: string, updates: Partial<CustomMemory>) => void;
   deleteMemory: (id: string) => void;
   getMemoriesForBaby: (babyId: string) => CustomMemory[];
+  clearMemoriesForBaby: (babyId: string) => void;
   
   // Reset
   reset: () => void;
@@ -75,6 +76,12 @@ export const useMemoryStore = create<MemoryStore>()(
 
       getMemoriesForBaby: (babyId) => {
         return get().memories.filter((memory) => memory.babyId === babyId);
+      },
+
+      clearMemoriesForBaby: (babyId) => {
+        set((state) => ({
+          memories: state.memories.filter((memory) => memory.babyId !== babyId),
+        }));
       },
 
       reset: () => set(initialState),

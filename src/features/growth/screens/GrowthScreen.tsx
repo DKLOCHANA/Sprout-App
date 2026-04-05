@@ -3,7 +3,7 @@
  * Main screen for tracking baby's growth with WHO/CDC percentiles
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,12 @@ import {
   StatusBar,
   useWindowDimensions,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useBabyStore } from '@/features/baby-profile/store';
 import { useGrowthAnalysis } from '@/shared/hooks';
 import { GrowthChart } from '@/shared/components/charts';
+import { EmptyState } from '@/shared/components';
 import { AlertBanner } from '../components/AlertBanner';
 import { PercentileBadge } from '../components/PercentileBadge';
 import { MetricCard } from '../components/MetricCard';
@@ -25,6 +27,7 @@ import { colors, typography, spacing } from '@/core/theme';
 import type { GrowthEntry } from '@/features/baby-profile/types';
 
 export function GrowthScreen() {
+  const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<'weight' | 'height' | 'headCircumference'>('weight');
   const { height: screenHeight } = useWindowDimensions();
@@ -39,6 +42,10 @@ export function GrowthScreen() {
   );
 
   const chartHeight = Math.max(220, screenHeight * 0.42);
+
+  const handleAddBaby = useCallback(() => {
+    router.push('/add-baby');
+  }, [router]);
 
   const handleSaveEntry = async (data: {
     weightKg: number | null;
@@ -65,13 +72,15 @@ export function GrowthScreen() {
   if (!baby) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.emptyState}>
-          <Ionicons name="person-add-outline" size={64} color={colors.textMuted} />
-          <Text style={styles.emptyTitle}>No Baby Profile</Text>
-          <Text style={styles.emptyText}>
-            Please add a baby profile to start tracking growth
-          </Text>
-        </View>
+        <EmptyState
+          icon="person-add-outline"
+          title="No Child Selected"
+          message="Add a child to start tracking their growth with WHO/CDC percentile charts."
+          action={{
+            label: 'Add Child',
+            onPress: handleAddBaby,
+          }}
+        />
       </SafeAreaView>
     );
   }
@@ -284,23 +293,6 @@ const styles = StyleSheet.create({
   noDataSubtext: {
     ...typography.bodySmall,
     color: colors.textMuted,
-    textAlign: 'center',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.h2,
-    color: colors.textPrimary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

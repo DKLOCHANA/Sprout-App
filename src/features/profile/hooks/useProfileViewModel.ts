@@ -188,12 +188,8 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
   }, [clearUser, resetBabyStore, resetMilestoneStore, router]);
 
   const handleFamilyManagement = useCallback(() => {
-    Alert.alert(
-      'Family Management',
-      'This feature allows you to add additional children or invite family members. Coming soon!',
-      [{ text: 'OK' }]
-    );
-  }, []);
+    router.push('/family-management');
+  }, [router]);
 
   const handlePrivacyPolicy = useCallback(() => {
     Linking.openURL('https://dklochana.github.io/sprout./privacy-policy/');

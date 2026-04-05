@@ -10,6 +10,8 @@ import { useRouter } from 'expo-router';
 import { colors, spacing } from '@/core/theme';
 import { useDashboard } from '../hooks';
 import { useSleep, SleepChart, LogSleepModal } from '@/features/sleep';
+import { BabySelectorModal, EmptyState } from '@/shared/components';
+import { useBabySwitcher } from '@/shared/hooks';
 import {
   AgeDisplay,
   UpNextCard,
@@ -19,6 +21,7 @@ import {
 export function DashboardScreen() {
   const router = useRouter();
   const [sleepModalVisible, setSleepModalVisible] = useState(false);
+  const [babySelectorVisible, setBabySelectorVisible] = useState(false);
 
   const {
     baby,
@@ -27,6 +30,8 @@ export function DashboardScreen() {
     upNextMilestones,
     getUpNextStatus,
   } = useDashboard();
+
+  const { babiesForDisplay } = useBabySwitcher();
 
   // Navigation handlers
   const handleLogGrowth = useCallback(() => {
@@ -45,8 +50,38 @@ export function DashboardScreen() {
     setSleepModalVisible(true);
   }, []);
 
+  const handleAddBaby = useCallback(() => {
+    router.push('/add-baby');
+  }, [router]);
+
+  const handleProfilePress = useCallback(() => {
+    setBabySelectorVisible(true);
+  }, []);
+
+  const handleAddBabyFromModal = useCallback(() => {
+    setBabySelectorVisible(false);
+    router.push('/add-baby');
+  }, [router]);
+
   // Get first up next milestone
   const primaryMilestone = upNextMilestones[0];
+
+  // Show empty state if no baby selected
+  if (!baby) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <EmptyState
+          icon="person-add-outline"
+          title="No Child Selected"
+          message="Add your first child to start tracking their growth, milestones, and precious memories."
+          action={{
+            label: 'Add Child',
+            onPress: handleAddBaby,
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -55,11 +90,14 @@ export function DashboardScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Age Display */}
+        {/* Age Display with profile icon */}
         <AgeDisplay 
           months={exactAge.months} 
           days={exactAge.days}
           babyName={baby?.name}
+          babyPhotoUri={baby?.photoUri}
+          showProfileIcon={babiesForDisplay.length > 1}
+          onProfilePress={handleProfilePress}
         />
 
         {/* Up Next Milestone Card */}
@@ -88,6 +126,13 @@ export function DashboardScreen() {
       <LogSleepModal
         visible={sleepModalVisible}
         onClose={() => setSleepModalVisible(false)}
+      />
+
+      {/* Baby Selector Modal */}
+      <BabySelectorModal
+        visible={babySelectorVisible}
+        onClose={() => setBabySelectorVisible(false)}
+        onAddBaby={handleAddBabyFromModal}
       />
     </SafeAreaView>
   );

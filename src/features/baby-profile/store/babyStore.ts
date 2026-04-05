@@ -23,6 +23,7 @@ interface BabyStore {
   selectBaby: (id: string | null) => void;
   getSelectedBaby: () => Baby | null;
   getBabyById: (id: string) => Baby | undefined;
+  ensureSelectedBaby: () => void;
   
   // Growth Entry Actions
   addGrowthEntry: (entry: GrowthEntry) => void;
@@ -70,27 +71,53 @@ export const useBabyStore = create<BabyStore>()(
         })),
 
       deleteBaby: (id) =>
-        set((state) => ({
-          babies: state.babies.filter((baby) => baby.id !== id),
-          selectedBabyId:
-            state.selectedBabyId === id ? null : state.selectedBabyId,
-          growthEntries: state.growthEntries.filter(
-            (entry) => entry.babyId !== id
-          ),
-        })),
+        set((state) => {
+          const remainingBabies = state.babies.filter((baby) => baby.id !== id);
+          // If deleting the selected baby, auto-select the first remaining one
+          const newSelectedId = state.selectedBabyId === id
+            ? (remainingBabies.length > 0 ? remainingBabies[0].id : null)
+            : state.selectedBabyId;
+          
+          return {
+            babies: remainingBabies,
+            selectedBabyId: newSelectedId,
+            growthEntries: state.growthEntries.filter(
+              (entry) => entry.babyId !== id
+            ),
+          };
+        }),
 
       selectBaby: (id) => set({ selectedBabyId: id }),
 
       getSelectedBaby: () => {
         const state = get();
-        return (
-          state.babies.find((baby) => baby.id === state.selectedBabyId) || null
-        );
+        // Find the selected baby
+        const selectedBaby = state.babies.find((baby) => baby.id === state.selectedBabyId);
+        
+        // If no baby is selected but babies exist, auto-select the first one
+        if (!selectedBaby && state.babies.length > 0) {
+          const firstBaby = state.babies[0];
+          // Update selection asynchronously to avoid state mutation during render
+          setTimeout(() => {
+            get().selectBaby(firstBaby.id);
+          }, 0);
+          return firstBaby;
+        }
+        
+        return selectedBaby || null;
       },
 
       getBabyById: (id) => {
         const state = get();
         return state.babies.find((baby) => baby.id === id);
+      },
+
+      // Ensure a baby is selected (call on app load)
+      ensureSelectedBaby: () => {
+        const state = get();
+        if (!state.selectedBabyId && state.babies.length > 0) {
+          set({ selectedBabyId: state.babies[0].id });
+        }
       },
 
       // Growth Entry Actions

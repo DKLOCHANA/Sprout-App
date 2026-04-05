@@ -1,22 +1,56 @@
 /**
  * AgeDisplay Component
  * Shows baby's current age with personalized greeting
+ * Includes profile icon to open baby selector
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, radii, shadows } from '@/core/theme';
 
 interface AgeDisplayProps {
   months: number;
   days: number;
   babyName?: string;
+  babyPhotoUri?: string | null;
+  onProfilePress?: () => void;
+  showProfileIcon?: boolean;
 }
 
-export function AgeDisplay({ months, days, babyName = 'Your baby' }: AgeDisplayProps) {
+export function AgeDisplay({ 
+  months, 
+  days, 
+  babyName = 'Your baby',
+  babyPhotoUri,
+  onProfilePress,
+  showProfileIcon = false,
+}: AgeDisplayProps) {
+  const initial = babyName.charAt(0).toUpperCase() || '?';
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
+        {/* Profile icon in top right corner */}
+        {showProfileIcon && onProfilePress && (
+          <Pressable 
+            style={styles.profileButton}
+            onPress={onProfilePress}
+            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+          >
+            <View style={styles.profileIconContainer}>
+              {babyPhotoUri ? (
+                <Image source={{ uri: babyPhotoUri }} style={styles.profileImage} />
+              ) : (
+                <Text style={styles.profileInitial}>{initial}</Text>
+              )}
+              <View style={styles.switchIndicator}>
+                <Ionicons name="swap-horizontal" size={10} color={colors.textOnPrimary} />
+              </View>
+            </View>
+          </Pressable>
+        )}
+
         {/* Greeting text */}
         <Text style={styles.greeting}>
           Your baby, <Text style={styles.babyName}>{babyName}</Text> is
@@ -69,12 +103,54 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
+  profileButton: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    zIndex: 1,
+  },
+  profileIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.secondaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    ...shadows.sm,
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    resizeMode: 'cover',
+  },
+  profileInitial: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textOnDark,
+  },
+  switchIndicator: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.background,
+  },
   greeting: {
     ...typography.body,
     fontSize: 16,
     color: colors.textPrimary,
     marginBottom: spacing.sm,
     lineHeight: 24,
+    paddingRight: spacing['2xl'], // Make room for profile icon
   },
   babyName: {
     

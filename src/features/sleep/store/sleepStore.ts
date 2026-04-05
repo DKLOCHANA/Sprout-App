@@ -19,6 +19,7 @@ interface SleepStore {
   getSleepEntriesForBaby: (babyId: string) => SleepEntry[];
   getRecentSleepEntries: (babyId: string, days?: number) => SleepEntry[];
   getTodaySleepEntry: (babyId: string) => SleepEntry | undefined;
+  clearEntriesForBaby: (babyId: string) => void;
   
   // Reset
   reset: () => void;
@@ -106,6 +107,12 @@ export const useSleepStore = create<SleepStore>()(
         return get().entries.find(
           (entry) => entry.babyId === babyId && entry.date === today
         );
+      },
+
+      clearEntriesForBaby: (babyId) => {
+        set((state) => ({
+          entries: state.entries.filter((entry) => entry.babyId !== babyId),
+        }));
       },
 
       reset: () => set(initialState),

@@ -81,6 +81,24 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="family-management"
+        options={{
+          href: null, // Hide from tab bar - accessed from Profile
+        }}
+      />
+      <Tabs.Screen
+        name="add-baby"
+        options={{
+          href: null, // Hide from tab bar - accessed from Family Management
+        }}
+      />
+      <Tabs.Screen
+        name="edit-baby"
+        options={{
+          href: null, // Hide from tab bar - accessed from Family Management
+        }}
+      />
+      <Tabs.Screen
         name="babies"
         options={{
           title: 'PROFILE',

@@ -13,8 +13,10 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii } from '@/core/theme';
+import { EmptyState } from '@/shared/components';
 import { CategoryTabs } from '../components/CategoryTabs';
 import { AgeFilterDropdown } from '../components/AgeFilterDropdown';
 import { MilestoneCard } from '../components/MilestoneCard';
@@ -23,6 +25,7 @@ import { useMilestones } from '../hooks';
 import type { MilestoneCategory, AgeFilterType, MilestoneStatus } from '../types';
 
 export function MilestoneExplorerScreen() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<MilestoneCategory>('Motor');
   const [selectedAgeFilter, setSelectedAgeFilter] = useState<AgeFilterType>('current');
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,17 +76,23 @@ export function MilestoneExplorerScreen() {
     setSearchQuery(query);
   }, []);
 
+  const handleAddBaby = useCallback(() => {
+    router.push('/add-baby');
+  }, [router]);
+
   if (!baby) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <StatusBar barStyle="dark-content" />
-        <View style={styles.emptyState}>
-          <Ionicons name="person-add-outline" size={64} color={colors.textMuted} />
-          <Text style={styles.emptyTitle}>No Baby Profile</Text>
-          <Text style={styles.emptyText}>
-            Please add a baby profile to start tracking milestones
-          </Text>
-        </View>
+        <EmptyState
+          icon="ribbon-outline"
+          title="No Child Selected"
+          message="Add a child to start exploring and tracking their developmental milestones."
+          action={{
+            label: 'Add Child',
+            onPress: handleAddBaby,
+          }}
+        />
       </SafeAreaView>
     );
   }
@@ -195,22 +204,5 @@ const styles = StyleSheet.create({
   },
   bottomPadding: {
     height: spacing['2xl'],
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.h2,
-    color: colors.textPrimary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
 });

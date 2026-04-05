@@ -10,3 +10,4 @@ export { DatePicker } from './DatePicker';
 export { Toggle } from './Toggle';
 export { Switch } from './Switch';
 export { MeasurementInput } from './MeasurementInput';
+export { ImagePicker } from './ImagePicker';

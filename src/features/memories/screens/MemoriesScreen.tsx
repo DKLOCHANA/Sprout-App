@@ -13,12 +13,15 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii } from '@/core/theme';
+import { EmptyState } from '@/shared/components';
 import { MemoryCard, EmptyMemories, AddMemoryModal } from '../components';
 import { useMemories } from '../hooks';
 
 export function MemoriesScreen() {
+  const router = useRouter();
   const { memories, baby, babyName, hasMemories, addCustomMemory } = useMemories();
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -42,17 +45,23 @@ export function MemoriesScreen() {
     [addCustomMemory]
   );
 
+  const handleAddBaby = useCallback(() => {
+    router.push('/add-baby');
+  }, [router]);
+
   if (!baby) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <StatusBar barStyle="dark-content" />
-        <View style={styles.emptyState}>
-          <Ionicons name="person-add-outline" size={64} color={colors.textMuted} />
-          <Text style={styles.emptyTitle}>No Baby Profile</Text>
-          <Text style={styles.emptyText}>
-            Please add a baby profile to start tracking memories
-          </Text>
-        </View>
+        <EmptyState
+          icon="camera-outline"
+          title="No Child Selected"
+          message="Add a child to start capturing and preserving precious memories."
+          action={{
+            label: 'Add Child',
+            onPress: handleAddBaby,
+          }}
+        />
       </SafeAreaView>
     );
   }
@@ -171,22 +180,5 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.27,
     shadowRadius: 4.65,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.h2,
-    color: colors.textPrimary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
 });
