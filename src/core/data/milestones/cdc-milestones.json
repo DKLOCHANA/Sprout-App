@@ -1,0 +1,694 @@
+{
+  "version": "1.0.0",
+  "source": "CDC",
+  "lastUpdated": "2024-01-01",
+  "milestones": [
+    {
+      "id": "motor_gross_001",
+      "title": "Lifts head when on tummy",
+      "description": "Baby can briefly lift head while lying on stomach",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "motor_gross_002",
+      "title": "Holds head steady without support",
+      "description": "Can hold head up steadily when held upright",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "motor_gross_003",
+      "title": "Pushes up on arms during tummy time",
+      "description": "Uses arms to push chest up during tummy time",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "motor_gross_004",
+      "title": "Rolls from tummy to back",
+      "description": "Can roll over from stomach to back",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_gross_005",
+      "title": "Rolls from back to tummy",
+      "description": "Can roll over from back to stomach",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_gross_006",
+      "title": "Sits without support for several seconds",
+      "description": "Can sit independently for short periods",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_gross_007",
+      "title": "Pushes up on straight arms during tummy time",
+      "description": "Arms fully extended during tummy time",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_gross_008",
+      "title": "Sits without support",
+      "description": "Can sit independently for extended periods",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "motor_gross_009",
+      "title": "Gets into sitting position independently",
+      "description": "Can move from lying down to sitting",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "motor_gross_010",
+      "title": "Crawls",
+      "description": "Moves forward on hands and knees",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "motor_gross_011",
+      "title": "Pulls to stand",
+      "description": "Uses furniture to pull self to standing",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_gross_012",
+      "title": "Walks holding onto furniture (cruising)",
+      "description": "Takes steps while holding onto furniture",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_gross_013",
+      "title": "Stands alone",
+      "description": "Can stand without support briefly",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_gross_014",
+      "title": "Takes a few independent steps",
+      "description": "Walks a few steps without holding onto anything",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 12, "max": 15 }
+    },
+    {
+      "id": "motor_gross_015",
+      "title": "Walks independently",
+      "description": "Walks well without assistance",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "motor_gross_016",
+      "title": "Runs",
+      "description": "Can run, though may be unsteady",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "motor_gross_017",
+      "title": "Kicks a ball",
+      "description": "Can kick a ball forward",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "motor_gross_018",
+      "title": "Climbs on furniture",
+      "description": "Climbs onto and off furniture without help",
+      "category": "Motor",
+      "subcategory": "Gross Motor",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "motor_fine_001",
+      "title": "Opens and closes hands",
+      "description": "Opens and closes hands voluntarily",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "motor_fine_002",
+      "title": "Brings hands to mouth",
+      "description": "Brings hands to mouth intentionally",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "motor_fine_003",
+      "title": "Reaches for toys",
+      "description": "Reaches toward objects of interest",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "motor_fine_004",
+      "title": "Reaches for and grabs nearby objects",
+      "description": "Successfully grabs objects within reach",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_fine_005",
+      "title": "Transfers objects between hands",
+      "description": "Passes toys from one hand to the other",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "motor_fine_006",
+      "title": "Uses raking grasp",
+      "description": "Uses fingers in a raking motion to grab small items",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "motor_fine_007",
+      "title": "Picks up small objects with pincer grasp",
+      "description": "Uses thumb and finger to pick up small items",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_fine_008",
+      "title": "Bangs two objects together",
+      "description": "Holds one object in each hand and bangs them",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_fine_009",
+      "title": "Points with index finger",
+      "description": "Uses index finger to point at things",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "motor_fine_010",
+      "title": "Stacks blocks",
+      "description": "Can stack 2-4 blocks on top of each other",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "motor_fine_011",
+      "title": "Scribbles with crayon",
+      "description": "Makes marks on paper with crayon",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "motor_fine_012",
+      "title": "Turns pages in a book",
+      "description": "Turns board book pages one at a time",
+      "category": "Motor",
+      "subcategory": "Fine Motor",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "cognitive_001",
+      "title": "Watches faces intently",
+      "description": "Shows interest in looking at faces",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "cognitive_002",
+      "title": "Follows moving objects with eyes",
+      "description": "Tracks objects that move side to side",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "cognitive_003",
+      "title": "Recognizes familiar faces",
+      "description": "Shows recognition of parents and caregivers",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "cognitive_004",
+      "title": "Responds to affection",
+      "description": "Responds positively to cuddling and holding",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "cognitive_005",
+      "title": "Shows curiosity about surroundings",
+      "description": "Looks around and explores environment visually",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "cognitive_006",
+      "title": "Mouths objects to explore",
+      "description": "Puts objects in mouth to learn about them",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "cognitive_007",
+      "title": "Looks for partially hidden objects",
+      "description": "Searches for toys that are partially covered",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "cognitive_008",
+      "title": "Understands object permanence",
+      "description": "Knows objects exist even when hidden",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "cognitive_009",
+      "title": "Explores cause and effect",
+      "description": "Enjoys dropping objects and making things happen",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "cognitive_010",
+      "title": "Plays simple games like peek-a-boo",
+      "description": "Participates in simple interactive games",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "cognitive_011",
+      "title": "Follows simple one-step instructions",
+      "description": "Understands and follows simple requests",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "cognitive_012",
+      "title": "Shows interest in pictures",
+      "description": "Points to pictures in books when named",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "cognitive_013",
+      "title": "Knows what ordinary objects are used for",
+      "description": "Understands purpose of common items like phone, cup",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "cognitive_014",
+      "title": "Engages in pretend play",
+      "description": "Pretends to feed a doll or talk on phone",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "cognitive_015",
+      "title": "Sorts shapes and colors",
+      "description": "Can group objects by shape or color",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "cognitive_016",
+      "title": "Completes simple puzzles",
+      "description": "Can complete 2-3 piece puzzles",
+      "category": "Cognitive",
+      "subcategory": "Learning",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "social_001",
+      "title": "Makes eye contact",
+      "description": "Looks at caregiver's eyes during feeding",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "social_002",
+      "title": "First social smile",
+      "description": "Smiles at people (not just reflexively)",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "social_003",
+      "title": "Smiles spontaneously",
+      "description": "Smiles often and responds to smiles",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "social_004",
+      "title": "Enjoys playing with others",
+      "description": "Shows enjoyment during interactive play",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "social_005",
+      "title": "Laughs out loud",
+      "description": "Laughs during play and interaction",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "social_006",
+      "title": "Recognizes and responds to own name",
+      "description": "Turns head when name is called",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "social_007",
+      "title": "Shows stranger anxiety",
+      "description": "May be wary or fearful of unfamiliar people",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "social_008",
+      "title": "Has favorite toys",
+      "description": "Shows preference for certain toys or objects",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "social_009",
+      "title": "Shows separation anxiety",
+      "description": "Cries when parent leaves",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "social_010",
+      "title": "Waves bye-bye",
+      "description": "Waves in response to bye-bye",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "social_011",
+      "title": "Plays games like pat-a-cake",
+      "description": "Participates in clapping games",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "social_012",
+      "title": "Copies other's actions",
+      "description": "Imitates gestures and actions of others",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "social_013",
+      "title": "Shows affection to familiar people",
+      "description": "Hugs and kisses familiar adults",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "social_014",
+      "title": "Points to show others something interesting",
+      "description": "Points to share attention",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "social_015",
+      "title": "Plays alongside other children",
+      "description": "Engages in parallel play near other kids",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "social_016",
+      "title": "Shows defiant behavior",
+      "description": "Says no and tests limits",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "social_017",
+      "title": "Gets excited around other children",
+      "description": "Shows interest and excitement near peers",
+      "category": "Social",
+      "subcategory": "Social-Emotional",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "language_001",
+      "title": "Coos and makes gurgling sounds",
+      "description": "Makes vowel sounds like 'ooh' and 'aah'",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "language_002",
+      "title": "Turns head toward sounds",
+      "description": "Responds to sounds by turning head",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 0, "max": 2 }
+    },
+    {
+      "id": "language_003",
+      "title": "Makes different cries for different needs",
+      "description": "Cries differently when hungry vs tired",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 2, "max": 4 }
+    },
+    {
+      "id": "language_004",
+      "title": "Begins to babble",
+      "description": "Makes consonant-vowel sounds like 'ba-ba'",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "language_005",
+      "title": "Responds to own name",
+      "description": "Looks when name is called",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 4, "max": 6 }
+    },
+    {
+      "id": "language_006",
+      "title": "Makes string of babbling sounds",
+      "description": "Says 'bababa' or 'mamama' strings",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "language_007",
+      "title": "Understands 'no'",
+      "description": "Responds to the word no",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 6, "max": 9 }
+    },
+    {
+      "id": "language_008",
+      "title": "Copies sounds and gestures",
+      "description": "Imitates sounds and movements",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "language_009",
+      "title": "Says 'mama' or 'dada' with meaning",
+      "description": "Uses mama/dada for correct parent",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "language_010",
+      "title": "Uses gestures like shaking head",
+      "description": "Shakes head for no or nods for yes",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 9, "max": 12 }
+    },
+    {
+      "id": "language_011",
+      "title": "Says 1-2 words besides mama/dada",
+      "description": "Uses a few meaningful words",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 12, "max": 15 }
+    },
+    {
+      "id": "language_012",
+      "title": "Points to things they want",
+      "description": "Uses pointing to communicate desires",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "language_013",
+      "title": "Says several single words",
+      "description": "Vocabulary of 5-10 words",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 12, "max": 18 }
+    },
+    {
+      "id": "language_014",
+      "title": "Points to body parts when named",
+      "description": "Can identify nose, eyes, etc. when asked",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "language_015",
+      "title": "Says 2-word phrases",
+      "description": "Combines words like 'more milk' or 'daddy go'",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "language_016",
+      "title": "Follows simple 2-step instructions",
+      "description": "Can follow 'get the ball and bring it here'",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    },
+    {
+      "id": "language_017",
+      "title": "Uses 50+ words",
+      "description": "Has vocabulary of 50 or more words",
+      "category": "Language",
+      "subcategory": "Communication",
+      "ageRangeMonths": { "min": 18, "max": 24 }
+    }
+  ],
+  "nurtureFocusContent": [
+    {
+      "id": "nurture_001",
+      "title": "Supporting Tummy Time",
+      "category": "Motor",
+      "ageRangeMonths": { "min": 0, "max": 6 },
+      "imageKey": "tummy_time",
+      "videoUrl": null,
+      "description": "Tips and techniques to make tummy time enjoyable"
+    },
+    {
+      "id": "nurture_002",
+      "title": "Encouraging First Steps",
+      "category": "Motor",
+      "ageRangeMonths": { "min": 9, "max": 15 },
+      "imageKey": "first_steps",
+      "videoUrl": null,
+      "description": "How to safely encourage walking"
+    },
+    {
+      "id": "nurture_003",
+      "title": "Building Language Skills",
+      "category": "Language",
+      "ageRangeMonths": { "min": 6, "max": 18 },
+      "imageKey": "language_skills",
+      "videoUrl": null,
+      "description": "Activities to boost communication"
+    },
+    {
+      "id": "nurture_004",
+      "title": "Social Play Activities",
+      "category": "Social",
+      "ageRangeMonths": { "min": 6, "max": 24 },
+      "imageKey": "social_play",
+      "videoUrl": null,
+      "description": "Games to develop social skills"
+    },
+    {
+      "id": "nurture_005",
+      "title": "Brain-Building Games",
+      "category": "Cognitive",
+      "ageRangeMonths": { "min": 3, "max": 18 },
+      "imageKey": "brain_games",
+      "videoUrl": null,
+      "description": "Fun activities for cognitive development"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "source": "WHO",
+  "document": "Guidelines on physical activity, sedentary behaviour and sleep for children under 5 years of age",
+  "url": "https://www.who.int/publications/i/item/9789241550536",
+  "lastUpdated": "2019-04-02",
+  "recommendations": [
+    {
+      "ageRangeMonths": { "min": 0, "max": 3 },
+      "label": "0-3 months",
+      "sleepHours": {
+        "min": 14,
+        "max": 17,
+        "recommended": 15.5
+      },
+      "includesNaps": true,
+      "notes": "Newborns typically sleep in 1-2 hour stretches throughout the day and night."
+    },
+    {
+      "ageRangeMonths": { "min": 3, "max": 4 },
+      "label": "3-4 months",
+      "sleepHours": {
+        "min": 14,
+        "max": 17,
+        "recommended": 15.5
+      },
+      "includesNaps": true,
+      "notes": "Infants begin to develop more regular sleep patterns."
+    },
+    {
+      "ageRangeMonths": { "min": 4, "max": 12 },
+      "label": "4-11 months",
+      "sleepHours": {
+        "min": 12,
+        "max": 16,
+        "recommended": 14
+      },
+      "includesNaps": true,
+      "notes": "Infants typically take 2-3 naps during the day."
+    },
+    {
+      "ageRangeMonths": { "min": 12, "max": 24 },
+      "label": "1-2 years",
+      "sleepHours": {
+        "min": 11,
+        "max": 14,
+        "recommended": 12.5
+      },
+      "includesNaps": true,
+      "notes": "Toddlers typically take 1-2 naps during the day."
+    },
+    {
+      "ageRangeMonths": { "min": 24, "max": 36 },
+      "label": "2-3 years",
+      "sleepHours": {
+        "min": 10,
+        "max": 13,
+        "recommended": 11.5
+      },
+      "includesNaps": true,
+      "notes": "Most toddlers still need one afternoon nap."
+    },
+    {
+      "ageRangeMonths": { "min": 36, "max": 60 },
+      "label": "3-4 years",
+      "sleepHours": {
+        "min": 10,
+        "max": 13,
+        "recommended": 11.5
+      },
+      "includesNaps": true,
+      "notes": "Some children may stop napping during this period."
+    }
+  ],
+  "qualityGuidelines": {
+    "goodSleep": "Quality sleep with regular sleep and wake times contributes to better health outcomes.",
+    "sleepHygiene": [
+      "Consistent bedtime routine",
+      "Regular sleep and wake times",
+      "Cool, quiet, and dark sleeping environment",
+      "Limit screen time before bed"
+    ]
+  }
+}
