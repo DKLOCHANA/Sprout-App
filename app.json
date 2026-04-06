@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.sprout.babytracker"
+      "bundleIdentifier": "com.sprout.babytracker",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {

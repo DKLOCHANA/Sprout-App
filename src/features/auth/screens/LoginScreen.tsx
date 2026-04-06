@@ -26,6 +26,7 @@ export function LoginScreen() {
   const {
     formData,
     isLoading,
+    isAppleLoading,
     error,
     updateField,
     handleSignIn,
@@ -79,16 +80,20 @@ export function LoginScreen() {
       },
       forgotPasswordButton: {
         alignSelf: 'flex-end' as const,
-        paddingVertical: responsive.isCompactScreen ? spacing.sm : spacing.md,
+        paddingVertical: spacing.md,
+      },
+      divider: {
+        marginTop: spacing.sm,
+        marginBottom: spacing.sm,
       },
       appleContainer: {
-        paddingVertical: responsive.isCompactScreen ? spacing.sm : spacing.md,
+        paddingBottom: spacing.xs,
       },
       footerContainer: {
         flexDirection: 'row' as const,
         justifyContent: 'center' as const,
         alignItems: 'center' as const,
-        paddingVertical: responsive.isCompactScreen ? spacing.md : spacing.lg,
+        paddingTop: spacing.xs,
       },
     }),
     [responsive]
@@ -182,11 +187,11 @@ export function LoginScreen() {
           {/* Bottom Section: Divider + Apple + Footer */}
           <View>
             {/* Divider */}
-            <AuthDivider text="OR" />
+            <AuthDivider text="OR" style={dynamicStyles.divider} />
 
             {/* Apple Login */}
             <View style={dynamicStyles.appleContainer}>
-              <AppleSignInButton onPress={handleAppleSignIn} loading={false} />
+              <AppleSignInButton onPress={handleAppleSignIn} loading={isAppleLoading} />
             </View>
 
             {/* Create Account Link - Bottom */}

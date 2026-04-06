@@ -1,20 +1,22 @@
 /**
  * Onboarding Stack Layout
- * Default route is add-baby (baby setup screen)
+ * Handles onboarding survey flow and baby setup
  */
 
 import { Stack } from 'expo-router';
+import { colors } from '@core/theme';
 
 export default function OnboardingLayout() {
   return (
     <Stack
-      initialRouteName="add-baby"
+      initialRouteName="index"
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#FFFDF9' },
+        contentStyle: { backgroundColor: colors.background },
         animation: 'slide_from_right',
       }}
     >
+      <Stack.Screen name="index" options={{ animation: 'fade' }} />
       <Stack.Screen name="add-baby" />
     </Stack>
   );

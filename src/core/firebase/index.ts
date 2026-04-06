@@ -10,6 +10,7 @@ export {
   resetPassword,
   getCurrentUser,
   deleteAccount,
+  signInWithApple,
   type AuthUser,
   type AuthResult,
 } from './auth';

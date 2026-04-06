@@ -5,9 +5,9 @@
 
 export const colors = {
   // Primary - Sage Green
-  primary: '#7CB899',
-  primaryLight: '#A8D4BE',
-  primaryDark: '#5A9A78',
+  primary: '#4A90D9',
+  primaryLight: '#6BA5E7',
+  primaryDark: '#5B9FE3',
   primaryDim: 'rgba(124, 184, 153, 0.15)',
 
   // Secondary - Soft Blue (for CTA buttons)

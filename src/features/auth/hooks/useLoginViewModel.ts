@@ -7,17 +7,19 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { signInWithEmail, resetPassword } from '@core/firebase';
+import { signInWithEmail, signInWithApple, resetPassword } from '@core/firebase';
+import { userService } from '@core/firebase';
 import { useAuthStore } from '../store';
 import { LoginFormData } from '../types';
 
 interface UseLoginViewModelReturn {
   formData: LoginFormData;
   isLoading: boolean;
+  isAppleLoading: boolean;
   error: string | null;
   updateField: (field: keyof LoginFormData, value: string) => void;
   handleSignIn: () => Promise<void>;
-  handleAppleSignIn: () => void;
+  handleAppleSignIn: () => Promise<void>;
   handleForgotPassword: () => void;
   navigateToRegister: () => void;
 }
@@ -31,6 +33,7 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const updateField = useCallback((field: keyof LoginFormData, value: string) => {
@@ -72,10 +75,36 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
     }
   }, [formData, setUser]);
 
-  const handleAppleSignIn = useCallback(() => {
-    // Apple Sign In functionality will be implemented later
-    console.log('Apple Sign In pressed - to be implemented');
-  }, []);
+  const handleAppleSignIn = useCallback(async () => {
+    setIsAppleLoading(true);
+    setError(null);
+
+    try {
+      const result = await signInWithApple();
+
+      if (result.success && result.user) {
+        // Ensure user document exists in Firestore (for first-time Apple sign-in)
+        try {
+          await userService.createUser({
+            id: result.user.id,
+            email: result.user.email,
+            displayName: result.user.displayName,
+            photoURL: result.user.photoURL,
+          });
+        } catch {
+          // User doc may already exist - that's fine
+        }
+
+        setUser(result.user);
+      } else if (result.error !== 'Sign in was cancelled') {
+        setError(result.error ?? 'Apple Sign In failed');
+      }
+    } catch {
+      setError('An unexpected error occurred');
+    } finally {
+      setIsAppleLoading(false);
+    }
+  }, [setUser]);
 
   const handleForgotPassword = useCallback(() => {
     const email = formData.email.trim();
@@ -132,6 +161,7 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
   return {
     formData,
     isLoading,
+    isAppleLoading,
     error,
     updateField,
     handleSignIn,

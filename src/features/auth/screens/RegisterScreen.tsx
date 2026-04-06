@@ -26,6 +26,7 @@ export function RegisterScreen() {
   const {
     formData,
     isLoading,
+    isAppleLoading,
     error,
     updateField,
     handleSignUp,
@@ -75,14 +76,18 @@ export function RegisterScreen() {
         alignItems: 'center' as const,
         marginTop: responsive.isCompactScreen ? spacing.xs : spacing.sm,
       },
+      divider: {
+        marginTop: spacing.sm,
+        marginBottom: spacing.sm,
+      },
       appleContainer: {
-        paddingVertical: responsive.isCompactScreen ? spacing.xs : spacing.sm,
+        paddingBottom: spacing.xs,
       },
       footerContainer: {
         flexDirection: 'row' as const,
         justifyContent: 'center' as const,
         alignItems: 'center' as const,
-        paddingVertical: responsive.isCompactScreen ? spacing.sm : spacing.md,
+        paddingTop: spacing.xs,
       },
       // Register screen specific - tighter spacing for 4 inputs
       inputSpacing: responsive.isCompactScreen ? spacing.xs : responsive.inputSpacing,
@@ -189,11 +194,11 @@ export function RegisterScreen() {
           </View>
 
           {/* Divider */}
-          <AuthDivider text="OR" />
+          <AuthDivider text="OR" style={dynamicStyles.divider} />
 
           {/* Apple Login */}
           <View style={dynamicStyles.appleContainer}>
-            <AppleSignInButton onPress={handleAppleSignIn} loading={false} />
+            <AppleSignInButton onPress={handleAppleSignIn} loading={isAppleLoading} />
           </View>
 
           {/* Sign In Link - Bottom */}

@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
-import { signUpWithEmail, userService } from '@core/firebase';
+import { signUpWithEmail, signInWithApple, userService } from '@core/firebase';
 import { useAuthStore } from '../store';
 import { validateRegisterForm } from '../validation';
 
@@ -20,11 +20,12 @@ interface RegisterFormData {
 interface UseRegisterViewModelReturn {
   formData: RegisterFormData;
   isLoading: boolean;
+  isAppleLoading: boolean;
   error: string | null;
   fieldError: string | undefined;
   updateField: (field: keyof RegisterFormData, value: string) => void;
   handleSignUp: () => Promise<void>;
-  handleAppleSignIn: () => void;
+  handleAppleSignIn: () => Promise<void>;
   navigateToLogin: () => void;
 }
 
@@ -39,6 +40,7 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | undefined>(undefined);
 
@@ -94,10 +96,37 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
     }
   }, [formData, setUser]);
 
-  const handleAppleSignIn = useCallback(() => {
-    // Apple Sign In functionality will be implemented later
-    console.log('Apple Sign In pressed - to be implemented');
-  }, []);
+  const handleAppleSignIn = useCallback(async () => {
+    setIsAppleLoading(true);
+    setError(null);
+    setFieldError(undefined);
+
+    try {
+      const result = await signInWithApple();
+
+      if (result.success && result.user) {
+        // Create user document in Firestore
+        try {
+          await userService.createUser({
+            id: result.user.id,
+            email: result.user.email,
+            displayName: result.user.displayName,
+            photoURL: result.user.photoURL,
+          });
+        } catch {
+          // User doc may already exist - that's fine
+        }
+
+        setUser(result.user);
+      } else if (result.error !== 'Sign in was cancelled') {
+        setError(result.error ?? 'Apple Sign In failed');
+      }
+    } catch {
+      setError('An unexpected error occurred');
+    } finally {
+      setIsAppleLoading(false);
+    }
+  }, [setUser]);
 
   const navigateToLogin = useCallback(() => {
     router.push('/(auth)/login');
@@ -106,6 +135,7 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
   return {
     formData,
     isLoading,
+    isAppleLoading,
     error,
     fieldError,
     updateField,

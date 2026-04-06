@@ -10,9 +10,12 @@ import {
   sendPasswordResetEmail,
   updateProfile,
   deleteUser,
+  signInWithCredential,
+  OAuthProvider,
   User,
   AuthError,
 } from 'firebase/auth';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { getFirebaseAuth } from './config';
 
 export interface AuthUser {
@@ -136,6 +139,91 @@ export function getCurrentUser(): AuthUser | null {
   const auth = getFirebaseAuth();
   const user = auth.currentUser;
   return user ? mapFirebaseUser(user) : null;
+}
+
+export async function signInWithApple(): Promise<AuthResult> {
+  try {
+    // Check if Apple Sign In is available on this device
+    const isAvailable = await AppleAuthentication.isAvailableAsync();
+    if (!isAvailable) {
+      return {
+        success: false,
+        error: 'Apple Sign In is not available on this device',
+      };
+    }
+
+    // Request Apple credential
+    const appleCredential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+
+    // Ensure we have an identity token
+    if (!appleCredential.identityToken) {
+      return {
+        success: false,
+        error: 'No identity token received from Apple',
+      };
+    }
+
+    // Create Firebase OAuth credential
+    const provider = new OAuthProvider('apple.com');
+    const oAuthCredential = provider.credential({
+      idToken: appleCredential.identityToken,
+    });
+
+    // Sign in to Firebase
+    const auth = getFirebaseAuth();
+    const result = await signInWithCredential(auth, oAuthCredential);
+
+    // Apple only provides name on first sign in, so we update profile if available
+    if (appleCredential.fullName?.givenName && !result.user.displayName) {
+      const displayName = [
+        appleCredential.fullName.givenName,
+        appleCredential.fullName.familyName,
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      if (displayName) {
+        await updateProfile(result.user, { displayName });
+      }
+    }
+
+    return {
+      success: true,
+      user: mapFirebaseUser(result.user),
+    };
+  } catch (error: unknown) {
+    // Handle user cancellation
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'ERR_REQUEST_CANCELED'
+    ) {
+      return {
+        success: false,
+        error: 'Sign in was cancelled',
+      };
+    }
+
+    // Handle Firebase auth errors
+    if (error && typeof error === 'object' && 'code' in error) {
+      const authError = error as AuthError;
+      return {
+        success: false,
+        error: getErrorMessage(authError),
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to sign in with Apple',
+    };
+  }
 }
 
 export async function deleteAccount(): Promise<AuthResult> {
