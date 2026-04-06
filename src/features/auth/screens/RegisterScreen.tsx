@@ -1,22 +1,24 @@
 /**
  * Register Screen
  * Sign up screen with email/password as primary, Apple sign-in at bottom
+ * Responsive layout - fits all content on screen without scrolling
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radii, typography } from '@core/theme';
 import { Input } from '@shared/components/ui';
+import { useResponsiveAuth } from '@shared/hooks';
 import { AppleSignInButton, AuthDivider } from '../components';
 import { useRegisterViewModel } from '../hooks/useRegisterViewModel';
 
@@ -31,6 +33,64 @@ export function RegisterScreen() {
     navigateToLogin,
   } = useRegisterViewModel();
 
+  const responsive = useResponsiveAuth();
+
+  // Memoize dynamic styles based on screen dimensions
+  const dynamicStyles = useMemo(
+    () => ({
+      scrollContent: {
+        flexGrow: 1,
+        paddingHorizontal: responsive.containerPadding,
+        paddingBottom: responsive.isCompactScreen ? spacing.sm : spacing.md,
+      },
+      logoContainer: {
+        alignItems: 'center' as const,
+        paddingTop: responsive.isCompactScreen ? spacing.xs : responsive.logoVerticalPadding,
+        paddingBottom: responsive.isCompactScreen ? spacing.xs : spacing.sm,
+      },
+      headerContainer: {
+        paddingVertical: responsive.isCompactScreen ? spacing.sm : responsive.headerVerticalPadding,
+      },
+      headline: {
+        ...typography.h1,
+        fontSize: responsive.headlineFontSize,
+        lineHeight: responsive.headlineLineHeight,
+        color: colors.textPrimary,
+        marginBottom: responsive.isCompactScreen ? spacing.xs : spacing.sm,
+      },
+      subheadline: {
+        ...typography.body,
+        fontSize: responsive.subheadlineFontSize,
+        lineHeight: responsive.subheadlineLineHeight,
+        color: colors.textSecondary,
+      },
+      formContainer: {
+        paddingTop: responsive.isCompactScreen ? 0 : responsive.formTopPadding,
+      },
+      signUpButton: {
+        height: responsive.buttonHeight,
+        borderRadius: radii.xl,
+        backgroundColor: colors.secondary,
+        justifyContent: 'center' as const,
+        alignItems: 'center' as const,
+        marginTop: responsive.isCompactScreen ? spacing.xs : spacing.sm,
+      },
+      appleContainer: {
+        paddingVertical: responsive.isCompactScreen ? spacing.xs : spacing.sm,
+      },
+      footerContainer: {
+        flexDirection: 'row' as const,
+        justifyContent: 'center' as const,
+        alignItems: 'center' as const,
+        paddingVertical: responsive.isCompactScreen ? spacing.sm : spacing.md,
+      },
+      // Register screen specific - tighter spacing for 4 inputs
+      inputSpacing: responsive.isCompactScreen ? spacing.xs : responsive.inputSpacing,
+      inputHeight: responsive.isCompactScreen ? 40 : responsive.inputHeight,
+    }),
+    [responsive]
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
@@ -38,28 +98,29 @@ export function RegisterScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={dynamicStyles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          bounces={true}
         >
           {/* Logo */}
-          <View style={styles.logoContainer}>
+          <View style={dynamicStyles.logoContainer}>
             <View style={styles.logoWrapper}>
-              <Ionicons name="leaf" size={28} color={colors.primary} />
+              <Ionicons name="leaf" size={responsive.logoSize} color={colors.primary} />
               <Text style={styles.logoText}>Sprout</Text>
             </View>
           </View>
 
           {/* Headline */}
-          <View style={styles.headerContainer}>
-            <Text style={styles.headline}>Create your{'\n'}account.</Text>
-            <Text style={styles.subheadline}>
+          <View style={dynamicStyles.headerContainer}>
+            <Text style={dynamicStyles.headline}>Create your{'\n'}account.</Text>
+            <Text style={dynamicStyles.subheadline}>
               Start tracking your baby's precious moments today.
             </Text>
           </View>
 
           {/* Email/Password Form - Primary */}
-          <View style={styles.formContainer}>
+          <View style={dynamicStyles.formContainer}>
             <Input
               label="FULL NAME"
               placeholder="John Doe"
@@ -68,6 +129,8 @@ export function RegisterScreen() {
               autoCapitalize="words"
               autoCorrect={false}
               autoComplete="name"
+              inputHeight={dynamicStyles.inputHeight}
+              containerSpacing={dynamicStyles.inputSpacing}
             />
 
             <Input
@@ -79,6 +142,8 @@ export function RegisterScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="email"
+              inputHeight={dynamicStyles.inputHeight}
+              containerSpacing={dynamicStyles.inputSpacing}
             />
 
             <Input
@@ -88,6 +153,8 @@ export function RegisterScreen() {
               onChangeText={(text) => updateField('password', text)}
               isPassword
               autoComplete="new-password"
+              inputHeight={dynamicStyles.inputHeight}
+              containerSpacing={dynamicStyles.inputSpacing}
             />
 
             <Input
@@ -97,6 +164,8 @@ export function RegisterScreen() {
               onChangeText={(text) => updateField('confirmPassword', text)}
               isPassword
               autoComplete="new-password"
+              inputHeight={dynamicStyles.inputHeight}
+              containerSpacing={dynamicStyles.inputSpacing}
             />
 
             {/* Error Message */}
@@ -108,7 +177,7 @@ export function RegisterScreen() {
 
             {/* Sign Up Button */}
             <TouchableOpacity
-              style={[styles.signUpButton, isLoading && styles.signUpButtonDisabled]}
+              style={[dynamicStyles.signUpButton, isLoading && styles.signUpButtonDisabled]}
               onPress={handleSignUp}
               disabled={isLoading}
               activeOpacity={0.8}
@@ -119,19 +188,16 @@ export function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Spacer */}
-          <View style={styles.spacer} />
-
           {/* Divider */}
           <AuthDivider text="OR" />
 
           {/* Apple Login */}
-          <View style={styles.appleContainer}>
+          <View style={dynamicStyles.appleContainer}>
             <AppleSignInButton onPress={handleAppleSignIn} loading={false} />
           </View>
 
           {/* Sign In Link - Bottom */}
-          <View style={styles.footerContainer}>
+          <View style={dynamicStyles.footerContainer}>
             <Text style={styles.footerText}>Already have an account? </Text>
             <TouchableOpacity onPress={navigateToLogin}>
               <Text style={styles.signInText}>Sign In</Text>
@@ -151,16 +217,6 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-  },
   logoWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -169,21 +225,6 @@ const styles = StyleSheet.create({
   logoText: {
     ...typography.h2,
     color: colors.textPrimary,
-  },
-  headerContainer: {
-    paddingVertical: spacing.lg,
-  },
-  headline: {
-    ...typography.h1,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  subheadline: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  formContainer: {
-    paddingTop: spacing.md,
   },
   errorContainer: {
     backgroundColor: colors.errorDim,
@@ -196,33 +237,12 @@ const styles = StyleSheet.create({
     color: colors.error,
     textAlign: 'center',
   },
-  signUpButton: {
-    height: 52,
-    borderRadius: radii.xl,
-    backgroundColor: colors.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.sm,
-  },
   signUpButtonDisabled: {
     opacity: 0.6,
   },
   signUpButtonText: {
     ...typography.button,
     color: colors.textOnPrimary,
-  },
-  spacer: {
-    flex: 1,
-    minHeight: spacing.lg,
-  },
-  appleContainer: {
-    paddingVertical: spacing.md,
-  },
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
   },
   footerText: {
     ...typography.body,

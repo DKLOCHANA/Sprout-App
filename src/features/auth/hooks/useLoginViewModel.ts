@@ -1,14 +1,14 @@
 /**
  * Login View Model
  * Handles login form state and authentication logic
+ * Note: Navigation is handled by AuthGate after auth state changes
  */
 
 import { useState, useCallback } from 'react';
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { signInWithEmail } from '@core/firebase';
-import { syncService } from '@core/storage/syncService';
+import { signInWithEmail, resetPassword } from '@core/firebase';
 import { useAuthStore } from '../store';
-import { useBabyStore } from '@features/baby-profile/store';
 import { LoginFormData } from '../types';
 
 interface UseLoginViewModelReturn {
@@ -25,8 +25,6 @@ interface UseLoginViewModelReturn {
 export function useLoginViewModel(): UseLoginViewModelReturn {
   const router = useRouter();
   const setUser = useAuthStore((state) => state.setUser);
-  const setOnboardingComplete = useAuthStore((state) => state.setOnboardingComplete);
-  const babies = useBabyStore((state) => state.babies);
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -60,24 +58,10 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
       const result = await signInWithEmail(email.trim(), password);
 
       if (result.success && result.user) {
+        // Set user in store - AuthGate will handle navigation
+        // after Firebase auth state change and data loading completes
         setUser(result.user);
-
-        // Try to load data from Firestore for returning users
-        try {
-          await syncService.loadFromFirestore(result.user.id);
-        } catch (syncError) {
-          console.warn('Failed to load data from Firestore:', syncError);
-        }
-
-        // Check if user has babies (completed onboarding)
-        const currentBabies = useBabyStore.getState().babies;
-        
-        if (currentBabies.length > 0) {
-          setOnboardingComplete();
-          router.replace('/(app)');
-        } else {
-          router.replace('/(onboarding)');
-        }
+        // Navigation is handled by AuthGate's onAuthStateChanged listener
       } else {
         setError(result.error ?? 'Sign in failed');
       }
@@ -86,7 +70,7 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [formData, setUser, setOnboardingComplete, router]);
+  }, [formData, setUser]);
 
   const handleAppleSignIn = useCallback(() => {
     // Apple Sign In functionality will be implemented later
@@ -94,9 +78,52 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
   }, []);
 
   const handleForgotPassword = useCallback(() => {
-    // Navigate to forgot password screen (to be implemented)
-    console.log('Forgot password pressed - to be implemented');
-  }, []);
+    const email = formData.email.trim();
+
+    Alert.prompt(
+      'Reset Password',
+      'Enter your email address to receive a password reset link.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Send Reset Link',
+          onPress: async (inputEmail?: string) => {
+            const emailToReset = inputEmail?.trim();
+
+            if (!emailToReset) {
+              Alert.alert('Error', 'Please enter a valid email address.');
+              return;
+            }
+
+            // Simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailToReset)) {
+              Alert.alert('Error', 'Please enter a valid email address.');
+              return;
+            }
+
+            const result = await resetPassword(emailToReset);
+
+            if (result.success) {
+              Alert.alert(
+                'Email Sent',
+                'If an account exists with this email, you will receive a password reset link shortly.',
+                [{ text: 'OK' }]
+              );
+            } else {
+              Alert.alert('Error', result.error ?? 'Failed to send reset email. Please try again.');
+            }
+          },
+        },
+      ],
+      'plain-text',
+      email, // Pre-fill with current email if available
+      'email-address'
+    );
+  }, [formData.email]);
 
   const navigateToRegister = useCallback(() => {
     router.push('/(auth)/register');

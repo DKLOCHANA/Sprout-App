@@ -15,6 +15,7 @@ interface BabyStore {
   selectedBabyId: string | null;
   growthEntries: GrowthEntry[];
   isSyncing: boolean;
+  isHydrated: boolean;
   
   // Baby Actions
   addBaby: (baby: Baby) => void;
@@ -47,6 +48,7 @@ const initialState = {
   selectedBabyId: null,
   growthEntries: [],
   isSyncing: false,
+  isHydrated: false,
 };
 
 export const useBabyStore = create<BabyStore>()(
@@ -197,12 +199,18 @@ export const useBabyStore = create<BabyStore>()(
         }
       },
 
-      // Reset
-      reset: () => set(initialState),
+      // Reset - keep isHydrated true since we don't need rehydration after reset
+      reset: () => set({ ...initialState, isHydrated: true }),
     }),
     {
       name: 'baby-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.warn('Baby store rehydration error:', error);
+        }
+        useBabyStore.setState({ isHydrated: true });
+      },
       partialize: (state) => ({
         babies: state.babies,
         selectedBabyId: state.selectedBabyId,

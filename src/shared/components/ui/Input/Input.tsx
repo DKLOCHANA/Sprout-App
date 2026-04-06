@@ -1,6 +1,7 @@
 /**
  * Input Component
  * Styled text input with label and password toggle
+ * Supports responsive sizing via inputHeight and containerSpacing props
  */
 
 import React, { useState } from 'react';
@@ -21,6 +22,10 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
   error?: string;
   containerStyle?: ViewStyle;
   isPassword?: boolean;
+  /** Responsive input height - defaults to 52 */
+  inputHeight?: number;
+  /** Responsive container margin bottom - defaults to spacing.md (16) */
+  containerSpacing?: number;
 }
 
 export function Input({
@@ -29,6 +34,8 @@ export function Input({
   containerStyle,
   isPassword = false,
   secureTextEntry,
+  inputHeight,
+  containerSpacing,
   ...props
 }: InputProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -37,8 +44,12 @@ export function Input({
   const showPasswordToggle = isPassword || secureTextEntry;
   const shouldHideText = showPasswordToggle && !isPasswordVisible;
 
+  // Use provided values or fall back to defaults
+  const finalInputHeight = inputHeight ?? 52;
+  const finalContainerSpacing = containerSpacing ?? spacing.md;
+
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[styles.container, { marginBottom: finalContainerSpacing }, containerStyle]}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View
         style={[
@@ -48,7 +59,7 @@ export function Input({
         ]}
       >
         <TextInput
-          style={styles.input}
+          style={[styles.input, { height: finalInputHeight }]}
           placeholderTextColor={colors.inputPlaceholder}
           secureTextEntry={shouldHideText}
           onFocus={() => setIsFocused(true)}
@@ -59,7 +70,7 @@ export function Input({
         />
         {showPasswordToggle && (
           <TouchableOpacity
-            style={styles.toggleButton}
+            style={[styles.toggleButton, { height: finalInputHeight }]}
             onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -78,7 +89,7 @@ export function Input({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: spacing.md,
+    // marginBottom is now dynamic, set via inline style
   },
   label: {
     ...typography.bodySmall,
@@ -105,14 +116,14 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 52,
+    // height is now dynamic, set via inline style
     paddingHorizontal: spacing.md,
     ...typography.body,
     color: colors.inputText,
   },
   toggleButton: {
     paddingHorizontal: spacing.md,
-    height: 52,
+    // height is now dynamic, set via inline style
     justifyContent: 'center',
     alignItems: 'center',
   },

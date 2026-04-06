@@ -1,6 +1,7 @@
 /**
  * Register View Model
  * Handles registration form state and authentication logic
+ * Note: Navigation is handled by AuthGate after auth state changes
  */
 
 import { useState, useCallback } from 'react';
@@ -79,9 +80,10 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
           console.warn('Failed to create Firestore user document:', firestoreError);
         }
 
+        // Set user in store - AuthGate will handle navigation
+        // after Firebase auth state change completes
         setUser(result.user);
-        // Navigate to onboarding for new users
-        router.replace('/(onboarding)');
+        // Navigation is handled by AuthGate's onAuthStateChanged listener
       } else {
         setError(result.error ?? 'Registration failed');
       }
@@ -90,7 +92,7 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [formData, setUser, router]);
+  }, [formData, setUser]);
 
   const handleAppleSignIn = useCallback(() => {
     // Apple Sign In functionality will be implemented later

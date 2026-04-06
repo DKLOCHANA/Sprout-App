@@ -112,11 +112,14 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
           style: 'destructive',
           onPress: async () => {
             try {
-              await signOut();
-              clearUser();
+              // Reset stores first
               resetBabyStore();
               resetMilestoneStore();
-              router.replace('/(auth)/login');
+              // Sign out from Firebase - AuthGate will handle navigation
+              // via onAuthStateChanged listener
+              await signOut();
+              clearUser();
+              // Navigation handled by AuthGate
             } catch (error) {
               console.error('Sign out error:', error);
               Alert.alert('Error', 'Failed to sign out. Please try again.');
@@ -125,7 +128,7 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
         },
       ]
     );
-  }, [clearUser, resetBabyStore, resetMilestoneStore, router]);
+  }, [clearUser, resetBabyStore, resetMilestoneStore]);
 
   const handleDeleteAccount = useCallback(async () => {
     Alert.alert(
@@ -163,12 +166,10 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
                       ]);
                       
                       // Reset all stores
-                      clearUser();
                       resetBabyStore();
                       resetMilestoneStore();
-                      
-                      // Navigate to registration
-                      router.replace('/(auth)/register');
+                      clearUser();
+                      // Navigation handled by AuthGate via onAuthStateChanged
                     } catch (error) {
                       console.error('Delete account error:', error);
                       Alert.alert(
@@ -185,7 +186,7 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
         },
       ]
     );
-  }, [clearUser, resetBabyStore, resetMilestoneStore, router]);
+  }, [clearUser, resetBabyStore, resetMilestoneStore]);
 
   const handleFamilyManagement = useCallback(() => {
     router.push('/family-management');
