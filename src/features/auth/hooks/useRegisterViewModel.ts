@@ -8,6 +8,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { signUpWithEmail, signInWithApple, userService } from '@core/firebase';
 import { useAuthStore } from '../store';
+import { revenueCatService } from '@/features/subscription';
 import { validateRegisterForm } from '../validation';
 
 interface RegisterFormData {
@@ -82,6 +83,9 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
           console.warn('Failed to create Firestore user document:', firestoreError);
         }
 
+        // Set RevenueCat user ID for subscription tracking
+        await revenueCatService.setUserId(result.user.id);
+
         // Set user in store - AuthGate will handle navigation
         // after Firebase auth state change completes
         setUser(result.user);
@@ -116,6 +120,9 @@ export function useRegisterViewModel(): UseRegisterViewModelReturn {
         } catch {
           // User doc may already exist - that's fine
         }
+
+        // Set RevenueCat user ID for subscription tracking
+        await revenueCatService.setUserId(result.user.id);
 
         setUser(result.user);
       } else if (result.error !== 'Sign in was cancelled') {

@@ -60,6 +60,21 @@ export interface NetworkError {
   retryable: boolean;
 }
 
+/**
+ * SubscriptionError — Payment and subscription failures
+ */
+export interface SubscriptionError {
+  type: 'SubscriptionError';
+  message: string;
+  code:
+    | 'PURCHASE_CANCELLED'
+    | 'PURCHASE_FAILED'
+    | 'RESTORE_FAILED'
+    | 'LIMIT_REACHED'
+    | 'NOT_CONFIGURED'
+    | 'UNKNOWN';
+}
+
 // ============================================================================
 // Union Type
 // ============================================================================
@@ -69,7 +84,8 @@ export type DomainError =
   | ValidationError
   | StorageError
   | NotFoundError
-  | NetworkError;
+  | NetworkError
+  | SubscriptionError;
 
 // ============================================================================
 // Type Guards
@@ -93,6 +109,10 @@ export function isNotFoundError(error: DomainError): error is NotFoundError {
 
 export function isNetworkError(error: DomainError): error is NetworkError {
   return error.type === 'NetworkError';
+}
+
+export function isSubscriptionError(error: DomainError): error is SubscriptionError {
+  return error.type === 'SubscriptionError';
 }
 
 // ============================================================================
@@ -139,6 +159,13 @@ export function createNetworkError(
   return { type: 'NetworkError', message, retryable };
 }
 
+export function createSubscriptionError(
+  message: string,
+  code: SubscriptionError['code'] = 'UNKNOWN'
+): SubscriptionError {
+  return { type: 'SubscriptionError', message, code };
+}
+
 // ============================================================================
 // User-Friendly Message Helper
 // ============================================================================
@@ -157,6 +184,14 @@ export function getErrorMessage(error: DomainError): string {
       return error.retryable
         ? 'Network error. Please check your connection and try again.'
         : error.message;
+    case 'SubscriptionError':
+      if (error.code === 'LIMIT_REACHED') {
+        return 'You\'ve reached your free tier limit. Upgrade to premium for unlimited access.';
+      }
+      if (error.code === 'PURCHASE_CANCELLED') {
+        return 'Purchase was cancelled.';
+      }
+      return error.message;
     default:
       return 'Something went wrong';
   }

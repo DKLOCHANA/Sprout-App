@@ -1,0 +1,1 @@
+export { revenueCatService } from './revenueCatService';

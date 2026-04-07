@@ -5,7 +5,8 @@
  */
 
 import React, { useCallback } from 'react';
-import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import * as ExpoImagePicker from 'expo-image-picker';
 import { colors, spacing, radii, typography } from '@/core/theme';
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   image: {
-    resizeMode: 'cover',
+    contentFit: 'cover',
   },
   placeholder: {
     backgroundColor: colors.secondaryLight,

@@ -4,3 +4,4 @@ export { SettingsSection } from './SettingsSection';
 export { SettingsRow } from './SettingsRow';
 export { StatChip } from './StatChip';
 export { FamilyMemberCard } from './FamilyMemberCard';
+export { SubscriptionCard } from './SubscriptionCard';

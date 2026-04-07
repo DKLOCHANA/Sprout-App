@@ -13,6 +13,7 @@ export const colors = {
   // Secondary - Soft Blue (for CTA buttons)
   secondary: '#4A90D9',
   secondaryLight: '#6BA5E7',
+  secondaryDim: 'rgba(74, 144, 217, 0.15)',
   secondaryGradientStart: '#5B9FE3',
   secondaryGradientEnd: '#3A7FC9',
 
@@ -42,8 +43,8 @@ export const colors = {
   // Semantic
   success: '#7CB899',
   successDim: 'rgba(124, 184, 153, 0.15)',
-  warning: '#FFEAA7',
-  warningDim: 'rgba(255, 234, 167, 0.15)',
+  warning: '#F5A623',
+  warningDim: 'rgba(245, 166, 35, 0.15)',
   error: '#E57373',
   errorDim: 'rgba(229, 115, 115, 0.15)',
   info: '#74B9FF',

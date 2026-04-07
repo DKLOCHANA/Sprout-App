@@ -12,6 +12,7 @@ import { useMilestoneStore } from '@/features/milestones/store';
 import { useAuthStore } from '@/features/auth/store';
 import { useGrowthAnalysis } from '@/shared/hooks';
 import { signOut, deleteAccount as firebaseDeleteAccount } from '@/core/firebase';
+import { revenueCatService } from '@/features/subscription';
 import type { ProfileStats } from '../types';
 import { differenceInMonths } from 'date-fns';
 
@@ -115,6 +116,10 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
               // Reset stores first
               resetBabyStore();
               resetMilestoneStore();
+              
+              // Clear RevenueCat user
+              await revenueCatService.clearUserId();
+              
               // Sign out from Firebase - AuthGate will handle navigation
               // via onAuthStateChanged listener
               await signOut();
@@ -151,6 +156,9 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
                   style: 'destructive',
                   onPress: async () => {
                     try {
+                      // Clear RevenueCat user first
+                      await revenueCatService.clearUserId();
+                      
                       // Delete Firebase account
                       await firebaseDeleteAccount();
                       
@@ -162,6 +170,7 @@ export function useProfileViewModel(): UseProfileViewModelReturn {
                         'activity-storage',
                         'photo-storage',
                         'memory-storage',
+                        'subscription-storage',
                         PROFILE_PHOTO_KEY,
                       ]);
                       

@@ -8,6 +8,7 @@ import milestoneData from '@/core/data/milestones/cdc-milestones.json';
 import { useMilestoneStore } from '@/features/milestones/store';
 import { useBabyStore } from '@/features/baby-profile/store';
 import { useMemoryStore } from '../store';
+import { useSubscription } from '@/features/subscription';
 import type { Milestone } from '@/features/milestones/types';
 import type { MemoryDisplayData } from '../types';
 
@@ -22,6 +23,7 @@ function formatDate(dateString: string): string {
 
 export function useMemories() {
   const { getSelectedBaby } = useBabyStore();
+  const { checkCanAddManualMemory } = useSubscription();
   
   // Subscribe to the achievements array directly for reactivity
   const allAchievements = useMilestoneStore((state) => state.achievements);
@@ -100,15 +102,21 @@ export function useMemories() {
     );
   }, [milestoneMemories, customMemories]);
 
-  // Add a new custom memory
+  // Add a new custom memory (with subscription check)
   const addCustomMemory = useCallback(
     (data: {
       title: string;
       description?: string;
       photoUri?: string;
       date: Date;
-    }) => {
-      if (!baby) return;
+    }): boolean => {
+      if (!baby) return false;
+
+      // Check subscription limits before adding manual memory
+      if (!checkCanAddManualMemory()) {
+        // checkCanAddManualMemory will navigate to paywall if limit reached
+        return false;
+      }
 
       addMemory({
         babyId: baby.id,
@@ -117,8 +125,10 @@ export function useMemories() {
         photoUri: data.photoUri,
         date: data.date.toISOString(),
       });
+      
+      return true;
     },
-    [baby, addMemory]
+    [baby, addMemory, checkCanAddManualMemory]
   );
 
   // Get baby's name for personalized subtitle
@@ -129,6 +139,9 @@ export function useMemories() {
   // Count total memories
   const totalMemories = memories.length;
 
+  // Count custom memories (for limit display)
+  const customMemoryCount = customMemories.length;
+
   // Check if has any memories
   const hasMemories = totalMemories > 0;
 
@@ -137,6 +150,7 @@ export function useMemories() {
     baby,
     babyName,
     totalMemories,
+    customMemoryCount,
     hasMemories,
     addCustomMemory,
   };

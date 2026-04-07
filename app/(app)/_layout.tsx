@@ -99,6 +99,12 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="paywall"
+        options={{
+          href: null, // Hide from tab bar - modal presentation
+        }}
+      />
+      <Tabs.Screen
         name="babies"
         options={{
           title: 'PROFILE',

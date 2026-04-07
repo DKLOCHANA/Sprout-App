@@ -1,7 +1,7 @@
 /**
  * Root Layout
  * Entry point for Expo Router
- * Initializes Firebase and global providers
+ * Initializes Firebase and RevenueCat, provides global providers
  */
 
 import React, { useEffect, useState } from 'react';
@@ -14,18 +14,23 @@ import { initializeFirebase } from '@core/firebase';
 import { AuthGate } from '@shared/components';
 import { colors } from '@core/theme';
 import { SplashScreen } from '../src/features/splash/SplashScreen';
+import { revenueCatService } from '@/features/subscription';
 
 export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Initialize Firebase on app start
+    // Initialize Firebase and RevenueCat on app start
     const initialize = async () => {
       try {
+        // Initialize Firebase first
         await initializeFirebase();
+        
+        // Initialize RevenueCat
+        await revenueCatService.initialize();
       } catch (error) {
-        console.warn('Firebase initialization error:', error);
+        console.warn('Initialization error:', error);
       }
       setIsInitialized(true);
     };

@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { signInWithEmail, signInWithApple, resetPassword } from '@core/firebase';
 import { userService } from '@core/firebase';
 import { useAuthStore } from '../store';
+import { revenueCatService } from '@/features/subscription';
 import { LoginFormData } from '../types';
 
 interface UseLoginViewModelReturn {
@@ -61,6 +62,9 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
       const result = await signInWithEmail(email.trim(), password);
 
       if (result.success && result.user) {
+        // Set RevenueCat user ID for subscription tracking
+        await revenueCatService.setUserId(result.user.id);
+        
         // Set user in store - AuthGate will handle navigation
         // after Firebase auth state change and data loading completes
         setUser(result.user);
@@ -95,6 +99,9 @@ export function useLoginViewModel(): UseLoginViewModelReturn {
           // User doc may already exist - that's fine
         }
 
+        // Set RevenueCat user ID for subscription tracking
+        await revenueCatService.setUserId(result.user.id);
+        
         setUser(result.user);
       } else if (result.error !== 'Sign in was cancelled') {
         setError(result.error ?? 'Apple Sign In failed');

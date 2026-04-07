@@ -9,6 +9,7 @@ import { useBabyStore } from '@/features/baby-profile/store';
 import { useMilestoneStore } from '@/features/milestones/store';
 import { useAuthStore } from '@/features/auth/store';
 import { useGrowthAnalysis } from '@/shared/hooks';
+import { useSubscription, useSubscriptionStore } from '@/features/subscription';
 import { pdfReportService } from '../services';
 import type { PdfReportData } from '../types';
 import { differenceInMonths, differenceInDays } from 'date-fns';
@@ -27,6 +28,8 @@ export function usePdfReport(): UsePdfReportReturn {
   const { getSelectedBaby, getGrowthEntriesForBaby } = useBabyStore();
   const { getAchievementsForBaby } = useMilestoneStore();
   const { user } = useAuthStore();
+  const { checkCanGenerateReport } = useSubscription();
+  const incrementReportCount = useSubscriptionStore((state) => state.incrementReportCount);
   
   const baby = getSelectedBaby();
   const growthEntries = baby ? getGrowthEntriesForBaby(baby.id) : [];
@@ -54,6 +57,12 @@ export function usePdfReport(): UsePdfReportReturn {
   }, []);
 
   const generateReport = useCallback(async () => {
+    // Check subscription limits before generating report
+    if (!checkCanGenerateReport()) {
+      // checkCanGenerateReport will navigate to paywall if limit reached
+      return;
+    }
+
     if (!baby) {
       Alert.alert('No Baby Profile', 'Please add a baby profile first.');
       return;
@@ -111,6 +120,9 @@ export function usePdfReport(): UsePdfReportReturn {
       };
 
       await pdfReportService.generateAndSharePdf(reportData);
+      
+      // Increment report count after successful generation
+      incrementReportCount();
     } catch (error) {
       console.error('Error generating report:', error);
       Alert.alert(
@@ -120,7 +132,7 @@ export function usePdfReport(): UsePdfReportReturn {
     } finally {
       setIsGenerating(false);
     }
-  }, [baby, latestEntry, latestPercentiles, getAchievementsForBaby, user, calculateAgeText]);
+  }, [baby, latestEntry, latestPercentiles, getAchievementsForBaby, user, calculateAgeText, checkCanGenerateReport, incrementReportCount]);
 
   return {
     isGenerating,

@@ -10,6 +10,7 @@ import { useBabyStore } from '../store';
 import { Baby, GrowthEntry, BiologicalSex } from '../types';
 import { useAuthStore } from '@features/auth/store';
 import { babyService } from '@core/firebase';
+import { useSubscription } from '@/features/subscription';
 
 interface FormErrors {
   name?: string;
@@ -23,6 +24,7 @@ interface FormErrors {
 export function useAddBabyViewModel() {
   const { user } = useAuthStore();
   const { addBabyWithInitialGrowth } = useBabyStore();
+  const { checkCanAddChild } = useSubscription();
 
   // Form state
   const [name, setName] = useState('');
@@ -76,6 +78,12 @@ export function useAddBabyViewModel() {
    * Handle form submission
    */
   const handleSubmit = useCallback(async () => {
+    // Check subscription limits before allowing submission
+    if (!checkCanAddChild()) {
+      // checkCanAddChild will navigate to paywall if limit reached
+      return;
+    }
+
     if (!validate()) {
       return;
     }
@@ -147,6 +155,7 @@ export function useAddBabyViewModel() {
     height,
     headCircumference,
     addBabyWithInitialGrowth,
+    checkCanAddChild,
   ]);
 
   /**

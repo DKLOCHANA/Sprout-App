@@ -1,2 +1,3 @@
 export { SplashScreen } from './SplashScreen';
-export { EnhancedSplashScreen } from './EnhancedSplashScreen';
+// EnhancedSplashScreen temporarily disabled - requires reanimated setup
+// export { EnhancedSplashScreen } from './EnhancedSplashScreen';

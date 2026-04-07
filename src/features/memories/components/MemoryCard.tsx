@@ -7,12 +7,12 @@ import React, { useCallback, memo } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   Pressable,
   Share,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii, shadows } from '@/core/theme';
 import type { MemoryDisplayData } from '../types';
@@ -87,7 +87,7 @@ function MemoryCardComponent({ memory, isFirst, isLast }: MemoryCardProps) {
               <Image
                 source={{ uri: memory.photoUri }}
                 style={styles.photo}
-                resizeMode="cover"
+                contentFit="cover"
               />
             </View>
           )}
