@@ -208,17 +208,27 @@ class SyncService {
 
   /**
    * Load all data from Firestore into local stores
+   * Only loads from Firebase if local data is empty (local-first approach)
    */
   async loadFromFirestore(userId: string): Promise<void> {
     try {
-      // Load babies and growth entries
-      await useBabyStore.getState().loadFromFirestore(userId);
+      // Check if we already have local data
+      const babyState = useBabyStore.getState();
+      const milestoneState = useMilestoneStore.getState();
+      
+      const hasLocalBabies = babyState.babies.length > 0;
+      const hasLocalMilestones = milestoneState.achievements.length > 0;
+
+      // Only load babies from Firebase if no local data exists
+      if (!hasLocalBabies) {
+        await useBabyStore.getState().loadFromFirestore(userId);
+      }
 
       // Get baby IDs for milestone loading
       const babyIds = useBabyStore.getState().babies.map((b) => b.id);
 
-      // Load milestones
-      if (babyIds.length > 0) {
+      // Only load milestones from Firebase if no local data exists
+      if (!hasLocalMilestones && babyIds.length > 0) {
         await useMilestoneStore.getState().loadFromFirestore(userId, babyIds);
       }
 

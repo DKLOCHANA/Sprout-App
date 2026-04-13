@@ -19,14 +19,15 @@ export const FREE_TIER_LIMITS: FreeTierLimits = {
  * These should match the products configured in RevenueCat dashboard
  */
 export const PRODUCT_IDS = {
-  MONTHLY: 'sprout_premium_monthly',
-  ANNUAL: 'sprout_premium_annual',
+  MONTHLY: 'Sprout_monthly',  // or 'Sprout_M'
+  ANNUAL: 'Sprout_yearly',    // or 'Sprout_Y'
 } as const;
 
 /**
  * RevenueCat entitlement identifier
+ * Must match EXACTLY what's configured in RevenueCat dashboard
  */
-export const ENTITLEMENT_ID = 'premium';
+export const ENTITLEMENT_ID = 'Sprout: Baby Milestone Tracker Premium';
 
 /**
  * RevenueCat offering identifier

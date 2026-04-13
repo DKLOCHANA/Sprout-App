@@ -17,6 +17,7 @@ interface ToggleProps<T> {
   value: T;
   onChange: (value: T) => void;
   label?: string;
+  error?: string;
 }
 
 export function Toggle<T extends string>({
@@ -24,11 +25,12 @@ export function Toggle<T extends string>({
   value,
   onChange,
   label,
+  error,
 }: ToggleProps<T>) {
   return (
     <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.toggleContainer}>
+      {label && <Text style={[styles.label, error ? styles.labelError : undefined]}>{label}</Text>}
+      <View style={[styles.toggleContainer, error ? styles.toggleContainerError : undefined]}>
         {options.map((option, index) => {
           const isSelected = value === option.value;
           const isFirst = index === 0;
@@ -58,6 +60,7 @@ export function Toggle<T extends string>({
           );
         })}
       </View>
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
 }
@@ -80,7 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.inputBorder,
-    overflow: 'hidden',
+    overflow: 'hidden' as const,
   },
   option: {
     flex: 1,
@@ -109,5 +112,16 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: colors.secondary,
     fontWeight: '600',
+  },
+  labelError: {
+    color: colors.error,
+  },
+  toggleContainerError: {
+    borderColor: colors.error,
+  },
+  errorText: {
+    ...typography.caption,
+    color: colors.error,
+    marginTop: spacing.xs,
   },
 });

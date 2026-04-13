@@ -42,7 +42,7 @@ export function LogSleepModal({ visible, onClose }: LogSleepModalProps) {
   useEffect(() => {
     if (!baby || !visible) return;
 
-    const dateString = selectedDate.toISOString().split('T')[0];
+    const dateString = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
     const existingEntry = entries.find(
       (e) => e.babyId === baby.id && e.date === dateString
     );
@@ -67,7 +67,7 @@ export function LogSleepModal({ visible, onClose }: LogSleepModalProps) {
   const handleSave = () => {
     if (!baby) return;
 
-    const dateString = selectedDate.toISOString().split('T')[0];
+    const dateString = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
     addSleepEntry({
       babyId: baby.id,
       date: dateString,

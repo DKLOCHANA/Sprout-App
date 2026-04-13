@@ -28,7 +28,7 @@ export function SleepChart({ onLogSleep }: SleepChartProps) {
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      const dateString = date.toISOString().split('T')[0];
+      const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' }).substring(0, 2);
 
       const entry = recentSleepEntries.find((e) => e.date === dateString);

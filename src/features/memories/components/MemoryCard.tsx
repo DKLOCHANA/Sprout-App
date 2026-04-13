@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import { Image } from 'expo-image';
+import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii, shadows } from '@/core/theme';
 import type { MemoryDisplayData } from '../types';
@@ -30,10 +31,28 @@ function MemoryCardComponent({ memory, isFirst, isLast }: MemoryCardProps) {
         ? `${memory.title}\n\n${memory.notes}\n\nAchieved: ${memory.formattedDate}`
         : `${memory.title}\n\nAchieved: ${memory.formattedDate}`;
 
-      await Share.share({
-        message,
-        title: memory.title,
-      });
+      // If there's a photo, share it along with the message
+      if (memory.photoUri) {
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(memory.photoUri, {
+            mimeType: 'image/jpeg',
+            dialogTitle: memory.title,
+          });
+        } else {
+          // Fallback to text-only sharing if image sharing not available
+          await Share.share({
+            message,
+            title: memory.title,
+          });
+        }
+      } else {
+        // No photo, share text only
+        await Share.share({
+          message,
+          title: memory.title,
+        });
+      }
     } catch {
       // User cancelled or error occurred
     }

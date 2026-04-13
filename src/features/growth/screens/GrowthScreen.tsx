@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useBabyStore } from '@/features/baby-profile/store';
+import { useAuthStore } from '@/features/auth/store';
 import { useGrowthAnalysis } from '@/shared/hooks';
 import { GrowthChart } from '@/shared/components/charts';
 import { EmptyState } from '@/shared/components';
@@ -24,6 +25,7 @@ import { AlertBanner } from '../components/AlertBanner';
 import { PercentileBadge } from '../components/PercentileBadge';
 import { MetricCard } from '../components/MetricCard';
 import { GrowthEntryModal } from '../components/GrowthEntryModal';
+import { babyService } from '@/core/firebase';
 import { colors, typography, spacing, shadows } from '@/core/theme';
 import type { GrowthEntry } from '@/features/baby-profile/types';
 
@@ -34,6 +36,7 @@ export function GrowthScreen() {
   const { height: screenHeight } = useWindowDimensions();
 
   const { getSelectedBaby, addGrowthEntry, getGrowthEntriesForBaby } = useBabyStore();
+  const { user } = useAuthStore();
   const baby = getSelectedBaby();
   const growthEntries = baby ? getGrowthEntriesForBaby(baby.id) : [];
 
@@ -67,7 +70,15 @@ export function GrowthScreen() {
       updatedAt: new Date().toISOString(),
     };
 
+    // Save locally first
     addGrowthEntry(newEntry);
+
+    // Sync to Firestore
+    if (user?.id) {
+      babyService.addGrowthEntry(user.id, baby.id, newEntry).catch((error) => {
+        console.warn('Failed to sync growth entry to Firestore:', error);
+      });
+    }
   };
 
   if (!baby) {

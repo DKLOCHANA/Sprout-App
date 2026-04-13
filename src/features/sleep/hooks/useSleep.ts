@@ -59,7 +59,7 @@ export function useSleep() {
     
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - 7);
-    const cutoffString = cutoffDate.toISOString().split('T')[0];
+    const cutoffString = `${cutoffDate.getFullYear()}-${String(cutoffDate.getMonth() + 1).padStart(2, '0')}-${String(cutoffDate.getDate()).padStart(2, '0')}`;
 
     return babySleepEntries.filter((entry) => entry.date >= cutoffString);
   }, [baby, babySleepEntries]);
@@ -116,7 +116,8 @@ export function useSleep() {
     (hours: number, minutes: number, quality?: 'good' | 'fair' | 'poor', notes?: string) => {
       if (!baby) return;
 
-      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
       addSleepEntry({
         babyId: baby.id,

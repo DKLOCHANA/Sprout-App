@@ -24,6 +24,7 @@ import {
   PrimaryButton,
 } from '@shared/components/ui';
 import { useBabySetupViewModel } from '../hooks';
+import { BiologicalSex } from '../types';
 
 export function BabySetupScreen() {
   const {
@@ -103,8 +104,9 @@ export function BabySetupScreen() {
               { value: 'male', label: 'Male' },
               { value: 'female', label: 'Female' },
             ]}
-            value={biologicalSex}
-            onChange={setBiologicalSex}
+            value={biologicalSex ?? ('' as any)}
+            onChange={(val) => setBiologicalSex(val as BiologicalSex)}
+            error={errors.biologicalSex}
           />
 
           {/* Prematurity Toggle */}

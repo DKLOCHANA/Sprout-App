@@ -68,8 +68,9 @@ function PaywallScreenComponent() {
     restorePurchases,
   } = usePaywallViewModel();
 
-  // In Expo Go or when no offerings are fetched, use mock data
-  const isUsingMockData = isExpoGo || offerings.length === 0;
+  // In Expo Go, when native module unavailable, or when no offerings are fetched, use mock data
+  const isNativeUnavailable = !revenueCatService.isAvailable();
+  const isUsingMockData = isExpoGo || isNativeUnavailable || offerings.length === 0;
   const displayOfferings = isUsingMockData ? MOCK_OFFERINGS : offerings;
   const currentSelectedId = selectedPackageId || displayOfferings[0]?.identifier;
 
@@ -81,7 +82,7 @@ function PaywallScreenComponent() {
   }, [router]);
 
   const handleContinue = useCallback(async () => {
-    if (isExpoGo) {
+    if (isExpoGo || isNativeUnavailable) {
       Alert.alert(
         'Expo Go Limitation',
         'In-app purchases require a development build. The purchase flow cannot be tested in Expo Go.\n\nTo test purchases:\n1. Run "npx expo run:ios" for a dev build\n2. Or build with EAS: "eas build --profile development"',
@@ -92,12 +93,19 @@ function PaywallScreenComponent() {
     
     const success = await purchase();
     if (success) {
+      // Ensure subscription status is fully synced before navigating away
+      try {
+        await revenueCatService.syncSubscriptionStatus();
+      } catch (syncError) {
+        console.warn('Post-purchase sync failed:', syncError);
+        // Continue anyway - the purchase was successful
+      }
       router.back();
     }
-  }, [purchase, router]);
+  }, [purchase, router, isNativeUnavailable]);
 
   const handleRestorePurchases = useCallback(async () => {
-    if (isExpoGo) {
+    if (isExpoGo || isNativeUnavailable) {
       Alert.alert(
         'Expo Go Limitation',
         'Restore purchases requires a development build with native modules.',
@@ -110,12 +118,18 @@ function PaywallScreenComponent() {
     try {
       const success = await restorePurchases();
       if (success) {
+        // Ensure subscription status is fully synced before navigating away
+        try {
+          await revenueCatService.syncSubscriptionStatus();
+        } catch (syncError) {
+          console.warn('Post-restore sync failed:', syncError);
+        }
         router.back();
       }
     } finally {
       setRestoreLoading(false);
     }
-  }, [restorePurchases, router]);
+  }, [restorePurchases, router, isNativeUnavailable]);
 
   const handleTermsOfService = useCallback(() => {
     Linking.openURL('https://dklochana.github.io/sprout./terms-of-service/');

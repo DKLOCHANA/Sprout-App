@@ -13,6 +13,7 @@ import { babyService } from '@core/firebase';
 interface FormErrors {
   name?: string;
   dateOfBirth?: string;
+  biologicalSex?: string;
   weight?: string;
   height?: string;
   headCircumference?: string;
@@ -26,7 +27,7 @@ export function useBabySetupViewModel() {
   // Form state
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
-  const [biologicalSex, setBiologicalSex] = useState<BiologicalSex>('male');
+  const [biologicalSex, setBiologicalSex] = useState<BiologicalSex | null>(null);
   const [isPremature, setIsPremature] = useState(false);
   const [originalDueDate, setOriginalDueDate] = useState(new Date());
   const [weight, setWeight] = useState('');
@@ -74,6 +75,7 @@ export function useBabySetupViewModel() {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
 
+    // Name is required
     if (!name.trim()) {
       newErrors.name = 'Baby name is required';
     }
@@ -83,21 +85,34 @@ export function useBabySetupViewModel() {
       newErrors.dateOfBirth = 'Date of birth cannot be in the future';
     }
 
+    // Biological sex is required
+    if (!biologicalSex) {
+      newErrors.biologicalSex = 'Please select biological sex';
+    }
+
     // If premature, original due date should be after date of birth
     if (isPremature && originalDueDate <= dateOfBirth) {
       newErrors.originalDueDate = 'Due date must be after birth date';
     }
 
-    // Validate measurements (optional but if provided, must be valid)
-    if (weight && (isNaN(Number(weight)) || Number(weight) <= 0)) {
+    // Weight is required
+    if (!weight || !weight.trim()) {
+      newErrors.weight = 'Weight is required';
+    } else if (isNaN(Number(weight)) || Number(weight) <= 0) {
       newErrors.weight = 'Please enter a valid weight';
     }
 
-    if (height && (isNaN(Number(height)) || Number(height) <= 0)) {
+    // Height is required
+    if (!height || !height.trim()) {
+      newErrors.height = 'Height is required';
+    } else if (isNaN(Number(height)) || Number(height) <= 0) {
       newErrors.height = 'Please enter a valid height';
     }
 
-    if (headCircumference && (isNaN(Number(headCircumference)) || Number(headCircumference) <= 0)) {
+    // Head circumference is required
+    if (!headCircumference || !headCircumference.trim()) {
+      newErrors.headCircumference = 'Head circumference is required';
+    } else if (isNaN(Number(headCircumference)) || Number(headCircumference) <= 0) {
       newErrors.headCircumference = 'Please enter a valid head circumference';
     }
 
@@ -131,7 +146,7 @@ export function useBabySetupViewModel() {
         userId: user.id,
         name: name.trim(),
         dateOfBirth: dateOfBirth.toISOString().split('T')[0],
-        biologicalSex,
+        biologicalSex: biologicalSex as BiologicalSex,
         isPremature,
         originalDueDate: isPremature
           ? originalDueDate.toISOString().split('T')[0]

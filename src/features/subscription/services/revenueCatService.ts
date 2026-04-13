@@ -3,14 +3,6 @@
  * Integration with RevenueCat for subscription management
  */
 
-import Purchases, {
-  PurchasesOffering,
-  PurchasesPackage,
-  CustomerInfo,
-  LOG_LEVEL,
-  PURCHASES_ERROR_CODE,
-  PurchasesError,
-} from 'react-native-purchases';
 import { Platform, Linking } from 'react-native';
 import type { 
   ProductOffering, 
@@ -22,12 +14,37 @@ import type {
 } from '../types';
 import { ENTITLEMENT_ID, OFFERING_ID, PRODUCT_IDS } from '../constants';
 import { useSubscriptionStore } from '../store';
+import { env } from '@core/config';
 
-// RevenueCat API Keys
-const REVENUECAT_IOS_PRODUCTION_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '';
-const REVENUECAT_IOS_TEST_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_TEST_KEY || '';
-const REVENUECAT_ANDROID_PRODUCTION_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '';
-const REVENUECAT_ANDROID_TEST_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_TEST_KEY || '';
+// Lazy-load RevenueCat to prevent crashes when native module is not available
+let Purchases: typeof import('react-native-purchases').default | null = null;
+let LOG_LEVEL: typeof import('react-native-purchases').LOG_LEVEL | null = null;
+let PURCHASES_ERROR_CODE: typeof import('react-native-purchases').PURCHASES_ERROR_CODE | null = null;
+
+type PurchasesPackage = import('react-native-purchases').PurchasesPackage;
+type CustomerInfo = import('react-native-purchases').CustomerInfo;
+type PurchasesError = import('react-native-purchases').PurchasesError;
+
+/**
+ * Safely load RevenueCat SDK
+ * Returns false if the native module is not available (e.g., Expo Go)
+ */
+async function loadRevenueCat(): Promise<boolean> {
+  if (Purchases !== null) {
+    return true;
+  }
+  
+  try {
+    const purchasesModule = await import('react-native-purchases');
+    Purchases = purchasesModule.default;
+    LOG_LEVEL = purchasesModule.LOG_LEVEL;
+    PURCHASES_ERROR_CODE = purchasesModule.PURCHASES_ERROR_CODE;
+    return true;
+  } catch (error) {
+    console.warn('RevenueCat native module not available:', error);
+    return false;
+  }
+}
 
 /**
  * Get the appropriate API key based on platform and environment
@@ -38,9 +55,10 @@ function getApiKey(): string {
   
   if (isIOS) {
     // Use test key in development, production key in release builds
-    return useTestKey ? REVENUECAT_IOS_TEST_KEY : REVENUECAT_IOS_PRODUCTION_KEY;
+    return useTestKey ? env.revenueCat.iosTestKey : env.revenueCat.iosKey;
   } else {
-    return useTestKey ? REVENUECAT_ANDROID_TEST_KEY : REVENUECAT_ANDROID_PRODUCTION_KEY;
+    // Android keys (to be configured)
+    return '';
   }
 }
 
@@ -64,8 +82,14 @@ function getExpirationDate(customerInfo: CustomerInfo): string | null {
  */
 function getPlanFromProductId(productId: string | undefined): SubscriptionPlan {
   if (!productId) return 'free';
-  if (productId.includes('annual')) return 'premium_annual';
-  if (productId.includes('monthly')) return 'premium_monthly';
+  const lowerProductId = productId.toLowerCase();
+  // Support various naming conventions: annual/yearly/_y, monthly/_m
+  if (lowerProductId.includes('annual') || lowerProductId.includes('yearly') || lowerProductId.endsWith('_y')) {
+    return 'premium_annual';
+  }
+  if (lowerProductId.includes('monthly') || lowerProductId.endsWith('_m')) {
+    return 'premium_monthly';
+  }
   return 'free';
 }
 
@@ -190,7 +214,7 @@ function isPurchaseCancelledError(error: unknown): boolean {
   }
   
   // Check RevenueCat specific error
-  if (error && typeof error === 'object' && 'code' in error) {
+  if (PURCHASES_ERROR_CODE && error && typeof error === 'object' && 'code' in error) {
     const purchaseError = error as PurchasesError;
     return purchaseError.code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR;
   }
@@ -201,6 +225,8 @@ function isPurchaseCancelledError(error: unknown): boolean {
 export const revenueCatService = {
   /** Track initialization state */
   _isInitialized: false,
+  /** Track if native module is available */
+  _isAvailable: false,
 
   /**
    * Initialize RevenueCat SDK
@@ -213,14 +239,22 @@ export const revenueCatService = {
         return;
       }
 
-      const apiKey = getApiKey();
+      // Try to load the native module
+      this._isAvailable = await loadRevenueCat();
       
-      if (!apiKey) {
-        console.warn('RevenueCat API key not configured. Using key:', __DEV__ ? 'TEST' : 'PRODUCTION');
+      if (!this._isAvailable || !Purchases) {
+        console.warn('RevenueCat native module not available - skipping initialization');
         return;
       }
 
-      if (__DEV__) {
+      const apiKey = getApiKey();
+      
+      if (!apiKey) {
+        console.warn('RevenueCat API key not configured');
+        return;
+      }
+
+      if (__DEV__ && LOG_LEVEL) {
         Purchases.setLogLevel(LOG_LEVEL.DEBUG);
         console.log('RevenueCat initializing with TEST key');
       } else {
@@ -230,24 +264,41 @@ export const revenueCatService = {
       await Purchases.configure({ apiKey, appUserID: userId });
       this._isInitialized = true;
       
-      // Set up listener for customer info changes
-      Purchases.addCustomerInfoUpdateListener((customerInfo) => {
-        const status = extractSubscriptionStatus(customerInfo);
-        useSubscriptionStore.getState().setSubscriptionStatus(status);
-      });
+      // Set up listener for customer info changes with error handling
+      try {
+        Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+          try {
+            const status = extractSubscriptionStatus(customerInfo);
+            useSubscriptionStore.getState().setSubscriptionStatus(status);
+          } catch (listenerError) {
+            console.warn('Error processing customer info update:', listenerError);
+          }
+        });
+      } catch (listenerError) {
+        console.warn('Failed to set up customer info listener:', listenerError);
+        // Continue without real-time updates - sync will still work
+      }
 
       // Sync subscription status on init
       await this.syncSubscriptionStatus();
     } catch (error) {
       console.error('RevenueCat initialization error:', error);
+      // Don't throw - allow app to continue without RevenueCat
     }
   },
 
   /**
-   * Check if SDK is initialized
+   * Check if SDK is initialized and available
    */
   isInitialized(): boolean {
-    return this._isInitialized;
+    return this._isInitialized && this._isAvailable;
+  },
+
+  /**
+   * Check if native module is available
+   */
+  isAvailable(): boolean {
+    return this._isAvailable;
   },
 
   /**
@@ -255,11 +306,25 @@ export const revenueCatService = {
    */
   async setUserId(userId: string): Promise<void> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        console.log('RevenueCat not available, skipping setUserId');
+        return;
+      }
+      
+      console.log('RevenueCat setUserId:', userId);
+      
       if (!this._isInitialized) {
+        // Initialize with the user ID if not already initialized
         await this.initialize(userId);
         return;
       }
+      
+      // Log in to RevenueCat with Firebase user ID
+      // This links purchases to the user account
       await Purchases.logIn(userId);
+      console.log('RevenueCat user logged in successfully');
+      
+      // Sync subscription status after login
       await this.syncSubscriptionStatus();
     } catch (error) {
       console.error('RevenueCat login error:', error);
@@ -271,6 +336,11 @@ export const revenueCatService = {
    */
   async clearUserId(): Promise<void> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        useSubscriptionStore.getState().reset();
+        return;
+      }
+      
       await Purchases.logOut();
       useSubscriptionStore.getState().reset();
     } catch (error) {
@@ -283,6 +353,11 @@ export const revenueCatService = {
    */
   async getOfferings(): Promise<ProductOffering[]> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        console.warn('RevenueCat not available - cannot fetch offerings');
+        return [];
+      }
+      
       const offerings = await Purchases.getOfferings();
       const currentOffering = offerings.current;
       
@@ -304,6 +379,10 @@ export const revenueCatService = {
    */
   async purchasePackage(packageId: string): Promise<PurchaseResult> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        return { success: false, error: 'In-app purchases not available' };
+      }
+      
       const offerings = await Purchases.getOfferings();
       const pkg = offerings.current?.availablePackages.find(
         (p) => p.identifier === packageId
@@ -345,6 +424,10 @@ export const revenueCatService = {
    */
   async restorePurchases(): Promise<RestoreResult> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        return { success: false, error: 'In-app purchases not available' };
+      }
+      
       const customerInfo = await Purchases.restorePurchases();
       const isPremium = checkPremiumEntitlement(customerInfo);
 
@@ -371,8 +454,17 @@ export const revenueCatService = {
    */
   async syncSubscriptionStatus(): Promise<void> {
     try {
+      if (!this._isAvailable || !Purchases) {
+        console.log('RevenueCat not available, skipping sync');
+        return;
+      }
+      
       const customerInfo = await Purchases.getCustomerInfo();
       const status = extractSubscriptionStatus(customerInfo);
+      
+      // Log for debugging
+      console.log('RevenueCat sync - isPremium:', status.isPremium, 'plan:', status.plan);
+      
       useSubscriptionStore.getState().setSubscriptionStatus(status);
     } catch (error) {
       console.error('Error syncing subscription status:', error);
@@ -426,10 +518,11 @@ export const revenueCatService = {
   /**
    * Get current environment info (for debugging)
    */
-  getEnvironmentInfo(): { isTest: boolean; platform: string } {
+  getEnvironmentInfo(): { isTest: boolean; platform: string; isAvailable: boolean } {
     return {
       isTest: __DEV__,
       platform: Platform.OS,
+      isAvailable: this._isAvailable,
     };
   },
 };

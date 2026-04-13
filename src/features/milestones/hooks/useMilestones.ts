@@ -7,6 +7,7 @@ import { useMemo, useCallback } from 'react';
 import milestoneData from '@/core/data/milestones/cdc-milestones.json';
 import { useMilestoneStore } from '../store';
 import { useBabyStore } from '@/features/baby-profile/store';
+import { useAuthStore } from '@/features/auth/store';
 import type {
   Milestone,
   MilestoneCategory,
@@ -36,7 +37,9 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
   const { category, ageFilter = 'current', searchQuery = '' } = options;
 
   const { getSelectedBaby } = useBabyStore();
+  const { user } = useAuthStore();
   const {
+    achievements,
     getMilestoneAchievement,
     updateMilestoneStatus,
     getAchievedCountForBaby,
@@ -130,7 +133,7 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
       const achievement = getMilestoneAchievement(milestoneId, baby.id);
       return achievement?.status || 'not_yet';
     },
-    [baby, getMilestoneAchievement]
+    [baby, getMilestoneAchievement, achievements]
   );
 
   // Update milestone status
@@ -141,16 +144,19 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
       options?: { notes?: string; photoUri?: string }
     ) => {
       if (!baby) return;
-      updateMilestoneStatus(milestoneId, baby.id, status, options);
+      updateMilestoneStatus(milestoneId, baby.id, status, {
+        ...options,
+        userId: user?.id,
+      });
     },
-    [baby, updateMilestoneStatus]
+    [baby, updateMilestoneStatus, user]
   );
 
   // Get achieved count
   const achievedCount = useMemo(() => {
     if (!baby) return 0;
     return getAchievedCountForBaby(baby.id);
-  }, [baby, getAchievedCountForBaby]);
+  }, [baby, getAchievedCountForBaby, achievements]);
 
   // Nurture focus content
   const nurtureFocusContent = useMemo(() => {

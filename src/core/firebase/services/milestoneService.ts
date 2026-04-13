@@ -73,16 +73,25 @@ export const milestoneService = {
     const now = Timestamp.now();
     const existingDoc = await getDoc(achievementRef);
     
+    // Build achievement object without undefined values (Firestore doesn't accept undefined)
     const achievement: FirestoreMilestoneAchievement = {
       milestoneId,
       status,
-      achievedAt: status === 'achieved' 
-        ? (existingDoc.exists() && existingDoc.data()?.achievedAt) || now 
-        : undefined,
-      notes: options?.notes,
-      photoUri: options?.photoUri,
       updatedAt: now,
     };
+
+    // Only add achievedAt if status is 'achieved'
+    if (status === 'achieved') {
+      achievement.achievedAt = (existingDoc.exists() && existingDoc.data()?.achievedAt) || now;
+    }
+
+    // Only add optional fields if they have values
+    if (options?.notes) {
+      achievement.notes = options.notes;
+    }
+    if (options?.photoUri) {
+      achievement.photoUri = options.photoUri;
+    }
 
     await setDoc(achievementRef, achievement, { merge: true });
   },
@@ -179,14 +188,25 @@ export const milestoneService = {
         update.milestoneId
       );
 
+      // Build achievement object without undefined values (Firestore doesn't accept undefined)
       const achievement: FirestoreMilestoneAchievement = {
         milestoneId: update.milestoneId,
         status: update.status,
-        achievedAt: update.status === 'achieved' ? now : undefined,
-        notes: update.notes,
-        photoUri: update.photoUri,
         updatedAt: now,
       };
+
+      // Only add achievedAt if status is 'achieved'
+      if (update.status === 'achieved') {
+        achievement.achievedAt = now;
+      }
+
+      // Only add optional fields if they have values
+      if (update.notes) {
+        achievement.notes = update.notes;
+      }
+      if (update.photoUri) {
+        achievement.photoUri = update.photoUri;
+      }
 
       batch.set(achievementRef, achievement, { merge: true });
     }

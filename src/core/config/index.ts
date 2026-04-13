@@ -2,4 +2,4 @@
  * Core Config Exports
  */
 
-export { env } from './env';
+export { env, isFirebaseConfigured } from './env';

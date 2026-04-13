@@ -2,7 +2,14 @@
  * Firebase Exports
  */
 
-export { initializeFirebase, getFirebaseApp, getFirebaseAuth } from './config';
+export { 
+  initializeFirebase, 
+  getFirebaseApp, 
+  getFirebaseAuth,
+  getInitializationError,
+  isFirebaseInitialized,
+  resetFirebaseState,
+} from './config';
 export {
   signInWithEmail,
   signUpWithEmail,

@@ -10,7 +10,9 @@ import { useBabyStore } from '@/features/baby-profile/store';
 import { useMilestoneStore } from '@/features/milestones/store';
 import { useSleepStore } from '@/features/sleep/store';
 import { useMemoryStore } from '@/features/memories/store';
+import { useAuthStore } from '@/features/auth/store';
 import { useBabySwitcher, BabyDisplayInfo } from '@/shared/hooks';
+import { babyService } from '@/core/firebase';
 import type { Baby } from '@/features/baby-profile/types';
 
 export interface UseFamilyManagementReturn {
@@ -44,6 +46,7 @@ export interface UseFamilyManagementReturn {
 export function useFamilyManagement(): UseFamilyManagementReturn {
   const router = useRouter();
   const { babiesForDisplay, selectedBabyId, selectBaby, babies: rawBabies } = useBabySwitcher();
+  const { user } = useAuthStore();
   
   const deleteBaby = useBabyStore((state) => state.deleteBaby);
   const deleteBabyAchievements = useMilestoneStore((state) => state.deleteBabyAchievements);
@@ -94,13 +97,20 @@ export function useFamilyManagement(): UseFamilyManagementReturn {
       const babyId = pendingDeleteBaby.id;
       const babyName = pendingDeleteBaby.name;
 
-      // Cascade delete all related data
+      // Cascade delete all related data locally
       deleteBabyAchievements?.(babyId);
       clearEntriesForBaby?.(babyId);
       clearMemoriesForBaby?.(babyId);
       
-      // Delete the baby (this also clears growth entries in babyStore)
+      // Delete the baby locally (this also clears growth entries in babyStore)
       deleteBaby(babyId);
+
+      // Sync deletion to Firebase
+      if (user?.id) {
+        babyService.deleteBaby(user.id, babyId).catch((error) => {
+          console.warn('Failed to sync baby deletion to Firebase:', error);
+        });
+      }
 
       // Close confirmation
       setIsDeleteConfirmVisible(false);
@@ -122,7 +132,7 @@ export function useFamilyManagement(): UseFamilyManagementReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [pendingDeleteBaby, deleteBaby, deleteBabyAchievements, clearEntriesForBaby, clearMemoriesForBaby]);
+  }, [pendingDeleteBaby, deleteBaby, deleteBabyAchievements, clearEntriesForBaby, clearMemoriesForBaby, user]);
 
   /**
    * Cancel delete confirmation

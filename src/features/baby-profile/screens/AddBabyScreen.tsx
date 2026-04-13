@@ -27,6 +27,7 @@ import {
   ImagePicker,
 } from '@shared/components/ui';
 import { useAddBabyViewModel } from '../hooks';
+import { BiologicalSex } from '../types';
 
 export function AddBabyScreen() {
   const {
@@ -116,8 +117,9 @@ export function AddBabyScreen() {
               { value: 'male', label: 'Male' },
               { value: 'female', label: 'Female' },
             ]}
-            value={biologicalSex}
-            onChange={setBiologicalSex}
+            value={biologicalSex ?? ('' as any)}
+            onChange={(val) => setBiologicalSex(val as BiologicalSex)}
+            error={errors.biologicalSex}
           />
 
           {/* Prematurity Toggle */}
@@ -141,7 +143,7 @@ export function AddBabyScreen() {
 
           {/* Starting Measurements */}
           <Text style={styles.measurementSectionLabel}>
-            CURRENT MEASUREMENTS (OPTIONAL)
+            CURRENT MEASUREMENTS
           </Text>
           <View style={styles.measurementRow}>
             <MeasurementInput
