@@ -45,6 +45,11 @@ export function GrowthScreen() {
     growthEntries
   );
 
+  // Derive the percentile for whichever metric is currently selected
+  const selectedPercentile = latestPercentiles
+    ? latestPercentiles[selectedMetric]
+    : undefined;
+
   const chartHeight = Math.max(220, screenHeight * 0.42);
 
   const handleAddBaby = useCallback(() => {
@@ -97,7 +102,12 @@ export function GrowthScreen() {
     );
   }
 
-  const activeAlerts = alerts.filter(alert => !alert.dismissed);
+  // Map selectedMetric → the GrowthMetric value used by alert detection
+  const alertMetricKey = selectedMetric === 'height' ? 'length' : selectedMetric;
+
+  const activeAlerts = alerts.filter(
+    alert => !alert.dismissed && alert.metric === alertMetricKey
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -130,10 +140,10 @@ export function GrowthScreen() {
 
         {/* Growth Chart - Full Width */}
         <View style={styles.chartSection}>
-          {latestPercentiles?.weight !== undefined && (
+          {selectedPercentile !== undefined && (
             <View style={styles.chartPercentileBadgeContainer}>
-              <PercentileBadge 
-                percentile={latestPercentiles.weight} 
+              <PercentileBadge
+                percentile={selectedPercentile}
                 size="large"
               />
             </View>
@@ -147,29 +157,35 @@ export function GrowthScreen() {
           />
         </View>
 
-        {/* Metric Cards */}
+        {/* Metric Cards — tap to switch chart */}
         {latestEntry && (
           <View style={styles.metricsSection}>
             <View style={styles.metricsRow}>
-              {latestEntry.weightKg && (
+              {latestEntry.weightKg != null && (
                 <MetricCard
                   label="WEIGHT"
                   value={latestEntry.weightKg.toFixed(1)}
                   unit="kg"
+                  isSelected={selectedMetric === 'weight'}
+                  onPress={() => setSelectedMetric('weight')}
                 />
               )}
-              {latestEntry.heightCm && (
+              {latestEntry.heightCm != null && (
                 <MetricCard
                   label="HEIGHT"
                   value={latestEntry.heightCm.toFixed(0)}
                   unit="cm"
+                  isSelected={selectedMetric === 'height'}
+                  onPress={() => setSelectedMetric('height')}
                 />
               )}
-              {latestEntry.headCircumferenceCm && (
+              {latestEntry.headCircumferenceCm != null && (
                 <MetricCard
                   label="HEAD"
                   value={latestEntry.headCircumferenceCm.toFixed(0)}
                   unit="cm"
+                  isSelected={selectedMetric === 'headCircumference'}
+                  onPress={() => setSelectedMetric('headCircumference')}
                 />
               )}
             </View>
