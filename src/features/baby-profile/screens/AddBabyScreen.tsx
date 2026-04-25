@@ -26,6 +26,8 @@ import {
   PrimaryButton,
   ImagePicker,
 } from '@shared/components/ui';
+import { useUnitPreference } from '@shared/hooks';
+import { unitLabels, unitPlaceholders } from '@shared/utils/unitConversions';
 import { useAddBabyViewModel } from '../hooks';
 import { BiologicalSex } from '../types';
 
@@ -54,6 +56,10 @@ export function AddBabyScreen() {
     handleSubmit,
     handleCancel,
   } = useAddBabyViewModel();
+
+  const { unitSystem, setUnitSystem } = useUnitPreference();
+  const weightUnit = unitLabels.weight(unitSystem);
+  const lengthUnit = unitLabels.length(unitSystem);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -141,35 +147,73 @@ export function AddBabyScreen() {
             />
           )}
 
-          {/* Starting Measurements */}
-          <Text style={styles.measurementSectionLabel}>
-            CURRENT MEASUREMENTS
-          </Text>
+          {/* Current Measurements */}
+          <View style={styles.measurementHeader}>
+            <Text style={styles.measurementSectionLabel}>
+              CURRENT MEASUREMENTS
+            </Text>
+            {/* Unit system toggle */}
+            <View style={styles.unitToggle}>
+              <Pressable
+                style={[
+                  styles.unitOption,
+                  unitSystem === 'metric' && styles.unitOptionActive,
+                ]}
+                onPress={() => setUnitSystem('metric')}
+              >
+                <Text
+                  style={[
+                    styles.unitOptionText,
+                    unitSystem === 'metric' && styles.unitOptionTextActive,
+                  ]}
+                >
+                  Metric
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.unitOption,
+                  unitSystem === 'standard' && styles.unitOptionActive,
+                ]}
+                onPress={() => setUnitSystem('standard')}
+              >
+                <Text
+                  style={[
+                    styles.unitOptionText,
+                    unitSystem === 'standard' && styles.unitOptionTextActive,
+                  ]}
+                >
+                  Standard
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+
           <View style={styles.measurementRow}>
             <MeasurementInput
               label="WEIGHT"
-              unit="kg"
+              unit={weightUnit}
               value={weight}
               onChangeText={setWeight}
-              placeholder="3.4"
+              placeholder={unitPlaceholders.weight(unitSystem)}
               error={errors.weight}
             />
             <View style={{ width: spacing.md }} />
             <MeasurementInput
               label="HEIGHT"
-              unit="cm"
+              unit={lengthUnit}
               value={height}
               onChangeText={setHeight}
-              placeholder="50"
+              placeholder={unitPlaceholders.height(unitSystem)}
               error={errors.height}
             />
             <View style={{ width: spacing.md }} />
             <MeasurementInput
               label="HEAD"
-              unit="cm"
+              unit={lengthUnit}
               value={headCircumference}
               onChangeText={setHeadCircumference}
-              placeholder="34"
+              placeholder={unitPlaceholders.head(unitSystem)}
               error={errors.headCircumference}
             />
           </View>
@@ -239,18 +283,50 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing['2xl'],
   },
+  // ─── Measurement section ────────────────────────────────────────────────────
+  measurementHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+    marginTop: spacing.md,
+  },
   measurementSectionLabel: {
     ...typography.bodySmall,
     color: colors.inputLabel,
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: spacing.md,
-    marginTop: spacing.md,
   },
   measurementRow: {
     flexDirection: 'row',
     marginBottom: spacing.lg,
+  },
+  // ─── Unit toggle ────────────────────────────────────────────────────────────
+  unitToggle: {
+    flexDirection: 'row',
+    backgroundColor: colors.inputBackground,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    overflow: 'hidden',
+  },
+  unitOption: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  unitOptionActive: {
+    backgroundColor: colors.secondary,
+  },
+  unitOptionText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  unitOptionTextActive: {
+    color: colors.textOnPrimary,
+    fontWeight: '600',
   },
   submitButton: {
     marginTop: spacing.xl,

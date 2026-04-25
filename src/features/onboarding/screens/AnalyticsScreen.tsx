@@ -1,7 +1,7 @@
 /**
  * Analytics Screen
- * Renders the appropriate analytics component based on selected answer
- * Designed to fit within screen without scrolling
+ * Renders 1 of 3 templates based on question type
+ * Eye-catching, conversion-optimized design
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -12,13 +12,9 @@ import { colors, spacing, typography, radii } from '@core/theme';
 import { AnalyticsData } from '@core/data/onboarding';
 import { ProgressDots } from '../components';
 import {
-  PercentileChart,
-  ProgressBarAnalytics,
-  CircleChart,
-  BigNumber,
-  Comparison,
-  SuccessRate,
-  Calendar,
+  HeroStatCard,
+  TransformationCard,
+  SocialProofCard,
 } from '../components/analytics';
 import { PrimaryButton } from '@shared/components/ui';
 
@@ -65,20 +61,12 @@ export function AnalyticsScreen({
     const { data } = analytics;
 
     switch (data.type) {
-      case 'percentileChart':
-        return <PercentileChart data={data} />;
-      case 'progressBar':
-        return <ProgressBarAnalytics data={data} />;
-      case 'circleChart':
-        return <CircleChart data={data} />;
-      case 'bigNumber':
-        return <BigNumber data={data} />;
-      case 'comparison':
-        return <Comparison data={data} />;
-      case 'successRate':
-        return <SuccessRate data={data} />;
-      case 'calendar':
-        return <Calendar data={data} />;
+      case 'heroStat':
+        return <HeroStatCard data={data} />;
+      case 'transformation':
+        return <TransformationCard data={data} />;
+      case 'socialProof':
+        return <SocialProofCard data={data} />;
       default:
         return null;
     }
@@ -101,7 +89,7 @@ export function AnalyticsScreen({
         <View style={styles.placeholder} />
       </View>
 
-      {/* Main Content - fills available space */}
+      {/* Main Content */}
       <View style={styles.content}>
         {/* Headline Section */}
         <Animated.View
@@ -114,10 +102,10 @@ export function AnalyticsScreen({
           ]}
         >
           <Text style={styles.headline}>{analytics.headline}</Text>
-          <Text style={styles.title}>{analytics.title}</Text>
+          <Text style={styles.subtitle}>{analytics.subtitle}</Text>
         </Animated.View>
 
-        {/* Analytics Content - takes remaining space */}
+        {/* Analytics Content */}
         <Animated.View
           style={[
             styles.analyticsContainer,
@@ -146,7 +134,7 @@ export function AnalyticsScreen({
       {/* Footer */}
       <View style={styles.footer}>
         <PrimaryButton
-          title={isLastAnalytics ? "Let's Grow Together 🌱" : "Continue"}
+          title={isLastAnalytics ? "Let's Grow Together" : analytics.ctaText}
           onPress={onContinue}
         />
       </View>
@@ -166,12 +154,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 22,
     backgroundColor: colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   progressContainer: {
     flex: 1,
@@ -195,7 +185,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: spacing.xs,
   },
-  title: {
+  subtitle: {
     ...typography.body,
     color: colors.textSecondary,
     textAlign: 'center',

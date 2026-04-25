@@ -26,84 +26,73 @@ export interface Question {
   answers: Answer[];
 }
 
-export type AnalyticsType = 
-  | 'percentileChart' 
-  | 'progressBar' 
-  | 'circleChart' 
-  | 'bigNumber'
-  | 'comparison'
-  | 'successRate'
-  | 'calendar';
+/**
+ * 3 Analytics Template Types — one per question
+ * Template 1: HeroStat (Q1 - Concern) - Animated ring + bold stat + mini pills
+ * Template 2: Transformation (Q2 - Frequency) - Before/after + animated counter
+ * Template 3: SocialProof (Q3 - Current Solution) - Success ring + testimonial + features
+ */
+export type AnalyticsType = 'heroStat' | 'transformation' | 'socialProof';
 
 export interface AnalyticsData {
   questionId: QuestionId;
   answerId: AnswerId;
   type: AnalyticsType;
-  title: string;
-  subtitle: string;
   headline: string;
+  subtitle: string;
   data: AnalyticsDisplayData;
   ctaText: string;
 }
 
-export interface PercentileChartData {
-  type: 'percentileChart';
-  percentile: number;
-  label: string;
-  description: string;
+// Template 1: Hero Stat Card (Q1 - What's your biggest concern?)
+export interface HeroStatData {
+  type: 'heroStat';
+  ringPercentage: number;        // Animated ring fill (0-100)
+  ringLabel: string;             // Text inside ring e.g. "65th"
+  ringSublabel: string;          // Below ring label e.g. "percentile"
+  ringColor: string;             // Accent color for the ring
+  icon: string;                  // MaterialCommunityIcons name
+  description: string;           // Short compelling description
+  pills: {                       // 3 mini stat pills
+    icon: string;
+    value: string;
+    label: string;
+  }[];
 }
 
-export interface ProgressBarData {
-  type: 'progressBar';
-  percentage: number;
-  label: string;
-  milestones: { name: string; tracked: boolean }[];
+// Template 2: Transformation Card (Q2 - How often do you worry?)
+export interface TransformationData {
+  type: 'transformation';
+  beforeValue: string;           // e.g. "12x"
+  beforeLabel: string;           // e.g. "daily worry checks"
+  afterValue: string;            // e.g. "2 min"
+  afterLabel: string;            // e.g. "to feel reassured"
+  improvementPercent: number;    // e.g. 83 — animated counter
+  improvementLabel: string;      // e.g. "less anxiety"
+  stat: {                        // Bottom compelling stat
+    value: string;
+    label: string;
+    icon: string;
+  };
 }
 
-export interface CircleChartData {
-  type: 'circleChart';
-  percentage: number;
-  centerText: string;
-  segments: { label: string; value: number; color: string }[];
-}
-
-export interface BigNumberData {
-  type: 'bigNumber';
-  number: string;
-  suffix: string;
-  label: string;
-  subStats: { value: string; label: string }[];
-}
-
-export interface ComparisonData {
-  type: 'comparison';
-  before: { value: string; label: string };
-  after: { value: string; label: string };
-  improvement: string;
-}
-
-export interface SuccessRateData {
-  type: 'successRate';
-  percentage: number;
-  totalUsers: string;
-  testimonial: string;
-}
-
-export interface CalendarData {
-  type: 'calendar';
-  trackingDays: number;
-  gapDays: number;
-  comparison: string;
+// Template 3: Social Proof Card (Q3 - What do you currently use?)
+export interface SocialProofData {
+  type: 'socialProof';
+  percentage: number;            // Animated ring percentage
+  percentageLabel: string;       // e.g. "of parents"
+  testimonial: string;           // Quote from a parent
+  testimonialAuthor: string;     // e.g. "Sarah, mom of 8mo"
+  features: {                    // 3 feature highlights with icons
+    icon: string;
+    text: string;
+  }[];
 }
 
 export type AnalyticsDisplayData =
-  | PercentileChartData
-  | ProgressBarData
-  | CircleChartData
-  | BigNumberData
-  | ComparisonData
-  | SuccessRateData
-  | CalendarData;
+  | HeroStatData
+  | TransformationData
+  | SocialProofData;
 
 export interface OnboardingState {
   currentStep: number;

@@ -16,6 +16,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, shadows } from '@/core/theme';
+import { useUnitPreference } from '@shared/hooks';
+import {
+  UnitSystem,
+  unitLabels,
+  unitPlaceholders,
+  toKg,
+  toCm,
+} from '@shared/utils/unitConversions';
 
 interface GrowthEntryModalProps {
   visible: boolean;
@@ -41,14 +49,16 @@ export function GrowthEntryModal({
   const [date, setDate] = useState(initialDate);
   const [loading, setLoading] = useState(false);
 
+  const { unitSystem, setUnitSystem } = useUnitPreference();
+
   const handleSave = async () => {
     try {
       setLoading(true);
-      
+
       await onSave({
-        weightKg: weight ? parseFloat(weight) : null,
-        heightCm: height ? parseFloat(height) : null,
-        headCircumferenceCm: headCirc ? parseFloat(headCirc) : null,
+        weightKg: weight ? toKg(parseFloat(weight), unitSystem) : null,
+        heightCm: height ? toCm(parseFloat(height), unitSystem) : null,
+        headCircumferenceCm: headCirc ? toCm(parseFloat(headCirc), unitSystem) : null,
         date,
       });
 
@@ -66,6 +76,9 @@ export function GrowthEntryModal({
 
   const isValid = weight || height || headCirc;
 
+  const weightUnit = unitLabels.weight(unitSystem);
+  const lengthUnit = unitLabels.length(unitSystem);
+
   return (
     <Modal
       visible={visible}
@@ -75,26 +88,68 @@ export function GrowthEntryModal({
     >
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onClose} />
-        
+
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>New Entry</Text>
             <Text style={styles.subtitle}>
-              Today, {date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
+              Today,{' '}
+              {date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
               })}
             </Text>
+          </View>
+
+          {/* Unit System Toggle */}
+          <View style={styles.unitToggleRow}>
+            <Text style={styles.unitToggleLabel}>UNITS</Text>
+            <View style={styles.unitToggle}>
+              <Pressable
+                style={[
+                  styles.unitOption,
+                  unitSystem === 'metric' && styles.unitOptionActive,
+                ]}
+                onPress={() => setUnitSystem('metric')}
+              >
+                <Text
+                  style={[
+                    styles.unitOptionText,
+                    unitSystem === 'metric' && styles.unitOptionTextActive,
+                  ]}
+                >
+                  Metric
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.unitOption,
+                  unitSystem === 'standard' && styles.unitOptionActive,
+                ]}
+                onPress={() => setUnitSystem('standard')}
+              >
+                <Text
+                  style={[
+                    styles.unitOptionText,
+                    unitSystem === 'standard' && styles.unitOptionTextActive,
+                  ]}
+                >
+                  Standard
+                </Text>
+              </Pressable>
+            </View>
           </View>
 
           <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
             {/* Weight Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>WEIGHT (KG)</Text>
+              <Text style={styles.label}>
+                WEIGHT ({weightUnit.toUpperCase()})
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="0.0"
+                placeholder={unitPlaceholders.weight(unitSystem)}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="decimal-pad"
                 value={weight}
@@ -104,10 +159,12 @@ export function GrowthEntryModal({
 
             {/* Height Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>HEIGHT (CM)</Text>
+              <Text style={styles.label}>
+                HEIGHT ({lengthUnit.toUpperCase()})
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="0.0"
+                placeholder={unitPlaceholders.height(unitSystem)}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="decimal-pad"
                 value={height}
@@ -117,10 +174,12 @@ export function GrowthEntryModal({
 
             {/* Head Circumference Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>HEAD CIRC. (CM)</Text>
+              <Text style={styles.label}>
+                HEAD CIRC. ({lengthUnit.toUpperCase()})
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="0.0"
+                placeholder={unitPlaceholders.head(unitSystem)}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="decimal-pad"
                 value={headCirc}
@@ -171,16 +230,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: `${colors.secondary}15`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   title: {
     ...typography.h2,
@@ -191,6 +241,45 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
   },
+  // ─── Unit toggle ────────────────────────────────────────────────────────────
+  unitToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  unitToggleLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  unitToggle: {
+    flexDirection: 'row',
+    backgroundColor: colors.inputBackground,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    overflow: 'hidden',
+  },
+  unitOption: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: 20,
+  },
+  unitOptionActive: {
+    backgroundColor: colors.secondary,
+  },
+  unitOptionText: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  unitOptionTextActive: {
+    color: colors.textOnPrimary,
+    fontWeight: '600',
+  },
+  // ─── Form ───────────────────────────────────────────────────────────────────
   form: {
     marginBottom: spacing.lg,
   },

@@ -1,192 +1,149 @@
 /**
  * Sprout App - Animated Splash Screen
- * Features: Gradient background, animated logo, slogan with fade-in
+ * Features: Gradient background, icon.png logo, smooth fade + scale entrance
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const ICON = require('../../../assets/icon.png');
 
 interface SplashScreenProps {
   onFinish: () => void;
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
-  // Animation values using React Native's Animated API
-  const logoScale = useRef(new Animated.Value(0)).current;
-  const logoRotate = useRef(new Animated.Value(0)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
+  const logoScale = useRef(new Animated.Value(0.78)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
-  const textTranslateY = useRef(new Animated.Value(20)).current;
+  const textTranslateY = useRef(new Animated.Value(16)).current;
   const sloganOpacity = useRef(new Animated.Value(0)).current;
-  const sloganTranslateY = useRef(new Animated.Value(20)).current;
-  const leafScale = useRef(new Animated.Value(0)).current;
+  const sloganTranslateY = useRef(new Animated.Value(12)).current;
+  const taglineOpacity = useRef(new Animated.Value(0)).current;
+  const glowOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Run all animations
-    Animated.sequence([
-      // 1. Logo appears
-      Animated.parallel([
-        Animated.timing(logoOpacity, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.spring(logoScale, {
-          toValue: 1,
-          friction: 8,
-          tension: 40,
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoRotate, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]),
+    const easeOut = Easing.out(Easing.cubic);
+
+    // Step 1 — logo fades + scales in gently
+    Animated.parallel([
+      Animated.timing(logoOpacity, {
+        toValue: 1,
+        duration: 600,
+        easing: easeOut,
+        useNativeDriver: true,
+      }),
+      Animated.timing(logoScale, {
+        toValue: 1,
+        duration: 700,
+        easing: Easing.out(Easing.back(1.4)),
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowOpacity, {
+        toValue: 1,
+        duration: 800,
+        delay: 200,
+        easing: easeOut,
+        useNativeDriver: true,
+      }),
     ]).start();
 
-    // 2. Leaves appear
-    Animated.timing(leafScale, {
-      toValue: 1,
-      duration: 500,
-      delay: 300,
-      useNativeDriver: true,
-    }).start();
-
-    // 3. App name appears
+    // Step 2 — app name rises in
     Animated.parallel([
       Animated.timing(textOpacity, {
         toValue: 1,
         duration: 500,
-        delay: 600,
+        delay: 550,
+        easing: easeOut,
         useNativeDriver: true,
       }),
-      Animated.spring(textTranslateY, {
+      Animated.timing(textTranslateY, {
         toValue: 0,
-        friction: 8,
-        tension: 40,
-        delay: 600,
+        duration: 500,
+        delay: 550,
+        easing: easeOut,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // 4. Slogan appears
+    // Step 3 — slogan rises in
     Animated.parallel([
       Animated.timing(sloganOpacity, {
         toValue: 1,
         duration: 500,
-        delay: 900,
+        delay: 800,
+        easing: easeOut,
         useNativeDriver: true,
       }),
-      Animated.spring(sloganTranslateY, {
+      Animated.timing(sloganTranslateY, {
         toValue: 0,
-        friction: 8,
-        tension: 40,
-        delay: 900,
+        duration: 500,
+        delay: 800,
+        easing: easeOut,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // 5. Finish after animations
-    const timer = setTimeout(() => {
-      onFinish();
-    }, 3000);
+    // Step 4 — tagline fades in last
+    Animated.timing(taglineOpacity, {
+      toValue: 1,
+      duration: 500,
+      delay: 1100,
+      easing: easeOut,
+      useNativeDriver: true,
+    }).start();
 
+    const timer = setTimeout(onFinish, 2800);
     return () => clearTimeout(timer);
   }, [onFinish]);
 
-  // Interpolate rotation
-  const spin = logoRotate.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
   return (
     <LinearGradient
-      colors={['#FFFDF9', '#E8F5F2', '#D4EBFA']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+      colors={['#FFFDF9', '#EEF6FF', '#E2F0FB']}
+      start={{ x: 0.2, y: 0 }}
+      end={{ x: 0.8, y: 1 }}
       style={styles.container}
     >
-      {/* Decorative floating elements */}
-      <View style={styles.decorativeContainer}>
-        {/* Top-left leaf */}
-        <Animated.View 
-          style={[
-            styles.decorativeLeaf, 
-            styles.leafTopLeft, 
-            { transform: [{ scale: leafScale }] }
-          ]}
-        >
-          <MaterialCommunityIcons name="leaf" size={60} color="#7CB899" style={{ opacity: 0.3 }} />
-        </Animated.View>
-        
-        {/* Bottom-right leaf */}
-        <Animated.View 
-          style={[
-            styles.decorativeLeaf, 
-            styles.leafBottomRight, 
-            { transform: [{ scale: leafScale }] }
-          ]}
-        >
-          <MaterialCommunityIcons name="leaf" size={80} color="#6BA5E7" style={{ opacity: 0.2 }} />
-        </Animated.View>
-      </View>
-
       {/* Main content */}
       <View style={styles.content}>
-        {/* Logo - Baby sprout icon */}
-        <Animated.View 
+        {/* Soft glow ring behind logo */}
+        <Animated.View style={[styles.glowRing, { opacity: glowOpacity }]} />
+
+        {/* App icon */}
+        <Animated.View
           style={[
-            styles.logoContainer, 
+            styles.logoContainer,
             {
               opacity: logoOpacity,
-              transform: [
-                { scale: logoScale },
-                { rotate: spin },
-              ],
-            }
+              transform: [{ scale: logoScale }],
+            },
           ]}
         >
-          <View style={styles.logoCircle}>
-            <LinearGradient
-              colors={['#5B9FE3', '#3A7FC9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.logoGradient}
-            >
-              <MaterialCommunityIcons 
-                name="leaf" 
-                size={80} 
-                color="#FFFFFF"
-              />
-            </LinearGradient>
-          </View>
+          <Image source={ICON} style={styles.logo} resizeMode="contain" />
         </Animated.View>
 
-        {/* App Name */}
-        <Animated.View 
+        {/* App name */}
+        <Animated.View
           style={[
-            styles.textContainer, 
+            styles.textContainer,
             {
               opacity: textOpacity,
               transform: [{ translateY: textTranslateY }],
-            }
+            },
           ]}
         >
           <Text style={styles.appName}>Sprout</Text>
         </Animated.View>
 
         {/* Slogan */}
-        <Animated.View 
+        <Animated.View
           style={[
-            styles.sloganContainer, 
+            styles.sloganContainer,
             {
               opacity: sloganOpacity,
               transform: [{ translateY: sloganTranslateY }],
-            }
+            },
           ]}
         >
           <Text style={styles.slogan}>
@@ -194,15 +151,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           </Text>
         </Animated.View>
 
-        {/* Subtle tagline */}
-        <Animated.View 
-          style={[
-            styles.taglineContainer, 
-            { opacity: sloganOpacity }
-          ]}
-        >
-          <MaterialCommunityIcons name="heart" size={16} color="#E57373" />
-          <Text style={styles.tagline}>  Clinically accurate • Parent approved</Text>
+        {/* Tagline */}
+        <Animated.View style={[styles.taglineContainer, { opacity: taglineOpacity }]}>
+          <View style={styles.dot} />
+          <Text style={styles.tagline}>Clinically accurate • Parent approved</Text>
+          <View style={styles.dot} />
         </Animated.View>
       </View>
     </LinearGradient>
@@ -215,75 +168,76 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  decorativeContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  decorativeLeaf: {
-    position: 'absolute',
-  },
-  leafTopLeft: {
-    top: 80,
-    left: 30,
-    transform: [{ rotate: '-20deg' }],
-  },
-  leafBottomRight: {
-    bottom: 120,
-    right: 40,
-    transform: [{ rotate: '45deg' }],
-  },
   content: {
     alignItems: 'center',
     paddingHorizontal: 40,
   },
-  logoContainer: {
-    marginBottom: 32,
+
+  /* Glow ring */
+  glowRing: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(74, 144, 217, 0.12)',
+    top: -30,
+    alignSelf: 'center',
   },
-  logoCircle: {
+
+  /* Logo */
+  logoContainer: {
+    marginBottom: 28,
+    shadowColor: '#4A90D9',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  logo: {
     width: 140,
     height: 140,
-    borderRadius: 70,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
+    borderRadius: 32,
   },
-  logoGradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
+  /* App name */
   textContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   appName: {
-    fontSize: 56,
+    fontSize: 52,
     fontWeight: '700',
     color: '#2D3436',
     letterSpacing: -1,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
+
+  /* Slogan */
   sloganContainer: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   slogan: {
-    fontSize: 18,
-    fontWeight: '500',
+    fontSize: 17,
+    fontWeight: '400',
     color: '#636E72',
     textAlign: 'center',
     lineHeight: 26,
   },
+
+  /* Tagline */
   taglineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    gap: 8,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#B2BEC3',
   },
   tagline: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#B2BEC3',
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
 });

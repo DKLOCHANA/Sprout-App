@@ -7,6 +7,7 @@ import React, { memo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { colors, spacing, radii, shadows } from '@/core/theme';
 import { Typography } from '@/shared/components/ui';
 import { useIsPremium, useSubscriptionPlan } from '@/features/subscription/store';
@@ -17,6 +18,7 @@ interface SubscriptionCardProps {
 }
 
 function SubscriptionCardComponent({ onManageSubscription }: SubscriptionCardProps) {
+  const router = useRouter();
   const isPremium = useIsPremium();
   const plan = useSubscriptionPlan();
   const { 
@@ -26,14 +28,13 @@ function SubscriptionCardComponent({ onManageSubscription }: SubscriptionCardPro
     manageSubscription,
   } = useSubscription();
 
+  const navigateToManageSubscription = () => {
+    router.push('/manage-subscription');
+  };
+
   const handlePress = () => {
     if (isPremium) {
-      // For premium users, open subscription management
-      if (onManageSubscription) {
-        onManageSubscription();
-      } else {
-        manageSubscription();
-      }
+      navigateToManageSubscription();
     } else {
       showPaywall();
     }
@@ -94,7 +95,7 @@ function SubscriptionCardComponent({ onManageSubscription }: SubscriptionCardPro
         {/* Manage Subscription Button */}
         <TouchableOpacity
           style={styles.manageButton}
-          onPress={manageSubscription}
+          onPress={navigateToManageSubscription}
           activeOpacity={0.7}
         >
           <Ionicons name="settings-outline" size={16} color={colors.primary} />

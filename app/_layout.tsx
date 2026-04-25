@@ -13,8 +13,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initializeFirebase, isFirebaseInitialized, resetFirebaseState } from '@core/firebase';
 import { AuthGate } from '@shared/components';
 import { colors } from '@core/theme';
+import * as NativeSplashScreen from 'expo-splash-screen';
 import { SplashScreen } from '../src/features/splash/SplashScreen';
 import { revenueCatService } from '@/features/subscription';
+
+// Prevent native splash from auto-hiding so we can dismiss it immediately on mount
+NativeSplashScreen.preventAutoHideAsync().catch(() => {});
 
 // Error Boundary for catching render errors
 class ErrorBoundary extends React.Component<
@@ -99,6 +103,11 @@ export default function RootLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [initError, setInitError] = useState<Error | null>(null);
   const initAttempted = useRef(false);
+
+  // Immediately hide native splash so only the custom animated splash is shown
+  useEffect(() => {
+    NativeSplashScreen.hideAsync().catch(() => {});
+  }, []);
 
   const runInitialization = useCallback(async () => {
     console.log('Running initialization...');

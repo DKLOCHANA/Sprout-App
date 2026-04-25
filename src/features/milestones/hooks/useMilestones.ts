@@ -8,6 +8,7 @@ import milestoneData from '@/core/data/milestones/cdc-milestones.json';
 import { useMilestoneStore } from '../store';
 import { useBabyStore } from '@/features/baby-profile/store';
 import { useAuthStore } from '@/features/auth/store';
+import { useSubscription } from '@/features/subscription';
 import type {
   Milestone,
   MilestoneCategory,
@@ -38,6 +39,7 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
 
   const { getSelectedBaby } = useBabyStore();
   const { user } = useAuthStore();
+  const { checkCanAchieveMilestone } = useSubscription();
   const {
     achievements,
     getMilestoneAchievement,
@@ -144,12 +146,22 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
       options?: { notes?: string; photoUri?: string }
     ) => {
       if (!baby) return;
+
+      // Check subscription limit when marking as achieved
+      if (status === 'achieved') {
+        const currentStatus = getMilestoneStatus(milestoneId);
+        // Only check limit if it's a new achievement (not already achieved)
+        if (currentStatus !== 'achieved' && !checkCanAchieveMilestone()) {
+          return;
+        }
+      }
+
       updateMilestoneStatus(milestoneId, baby.id, status, {
         ...options,
         userId: user?.id,
       });
     },
-    [baby, updateMilestoneStatus, user]
+    [baby, updateMilestoneStatus, user, getMilestoneStatus, checkCanAchieveMilestone]
   );
 
   // Get achieved count

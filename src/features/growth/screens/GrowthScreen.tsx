@@ -197,6 +197,52 @@ export function GrowthScreen() {
             <Text style={styles.addButtonTitle}>New Entry</Text>
           </Pressable>
         </View>
+
+        {/* DEV: Generate Test Data */}
+        {__DEV__ && (
+          <View style={styles.addButtonContainer}>
+            <Pressable
+              style={[styles.addButton, { backgroundColor: colors.warning }]}
+              onPress={() => {
+                if (!baby) return;
+                const now = Date.now();
+                const dob = new Date(baby.dateOfBirth).getTime();
+                const babyAgeDays = Math.floor((now - dob) / 86_400_000);
+
+                // Generate 30 random days within the past 12 months (but not before birth)
+                const maxDaysBack = Math.min(365, babyAgeDays);
+                const randomDays = Array.from({ length: 30 }, () =>
+                  Math.floor(Math.random() * maxDaysBack)
+                ).sort((a, b) => b - a); // newest first
+
+                for (const daysAgo of randomDays) {
+                  const date = new Date(now - daysAgo * 86_400_000);
+                  const ageMonths = (now - dob) / 86_400_000 / 30.44 - daysAgo / 30.44;
+                  const clampedAge = Math.max(0, ageMonths);
+
+                  // Realistic-ish growth curves with some noise
+                  const weightKg = +(3.3 + clampedAge * 0.6 + (Math.random() - 0.5) * 0.4).toFixed(2);
+                  const heightCm = +(49 + clampedAge * 2.5 + (Math.random() - 0.5) * 2).toFixed(1);
+                  const headCm = +(34 + clampedAge * 0.8 + (Math.random() - 0.5) * 1).toFixed(1);
+
+                  const entry: GrowthEntry = {
+                    id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                    babyId: baby.id,
+                    date: date.toISOString(),
+                    weightKg: Math.max(2.5, weightKg),
+                    heightCm: Math.max(45, heightCm),
+                    headCircumferenceCm: Math.max(32, headCm),
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  };
+                  addGrowthEntry(entry);
+                }
+              }}
+            >
+              <Text style={styles.addButtonTitle}>🧪 Generate 30 Test Entries</Text>
+            </Pressable>
+          </View>
+        )}
       </ScrollView>
 
       {/* Growth Entry Modal */}

@@ -9,6 +9,8 @@ import { useBabyStore } from '../store';
 import { Baby, GrowthEntry, BiologicalSex, BabyAge } from '../types';
 import { useAuthStore } from '@features/auth/store';
 import { babyService } from '@core/firebase';
+import { useUnitPreference } from '@shared/hooks';
+import { toKg, toCm } from '@shared/utils/unitConversions';
 
 interface FormErrors {
   name?: string;
@@ -23,6 +25,7 @@ interface FormErrors {
 export function useBabySetupViewModel() {
   const { user, setOnboardingComplete } = useAuthStore();
   const { addBabyWithInitialGrowth } = useBabyStore();
+  const { unitSystem } = useUnitPreference();
 
   // Form state
   const [name, setName] = useState('');
@@ -156,14 +159,14 @@ export function useBabySetupViewModel() {
         updatedAt: now,
       };
 
-      // Create initial growth entry
+      // Create initial growth entry (convert from selected unit system to metric for storage)
       const growthEntry: GrowthEntry = {
         id: `growth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         babyId,
         date: new Date().toISOString().split('T')[0],
-        weightKg: weight ? Number(weight) : null,
-        heightCm: height ? Number(height) : null,
-        headCircumferenceCm: headCircumference ? Number(headCircumference) : null,
+        weightKg: weight ? toKg(Number(weight), unitSystem) : null,
+        heightCm: height ? toCm(Number(height), unitSystem) : null,
+        headCircumferenceCm: headCircumference ? toCm(Number(headCircumference), unitSystem) : null,
         notes: 'Initial baseline measurement',
         createdAt: now,
         updatedAt: now,

@@ -13,13 +13,8 @@ export default {
     userInterfaceStyle: "light",
     newArchEnabled: true,
     scheme: "sprout",
-    splash: {
-      image: "./assets/splash-icon.png",
-      resizeMode: "contain",
-      backgroundColor: "#FFFDF9"
-    },
     ios: {
-      supportsTablet: false,
+      supportsTablet: true,
       bundleIdentifier: "com.sprout.babytracker",
       usesAppleSignIn: true,
       buildNumber: "1",

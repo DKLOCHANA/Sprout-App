@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +17,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+
+const APP_ICON = require('../../../../assets/icon.png');
 import { colors, spacing, radii, typography } from '@core/theme';
 import { Input } from '@shared/components/ui';
 import { useResponsiveAuth } from '@shared/hooks';
@@ -111,7 +114,7 @@ export function RegisterScreen() {
           {/* Logo */}
           <View style={dynamicStyles.logoContainer}>
             <View style={styles.logoWrapper}>
-              <Ionicons name="leaf" size={responsive.logoSize} color={colors.primary} />
+              <Image source={APP_ICON} style={styles.logoIcon} resizeMode="contain" />
               <Text style={styles.logoText}>Sprout</Text>
             </View>
           </View>
@@ -223,9 +226,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoWrapper: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.sm,
+  },
+  logoIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 18,
   },
   logoText: {
     ...typography.h2,

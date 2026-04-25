@@ -24,7 +24,7 @@ export { revenueCatService } from './services';
 export { FeatureCard, PricingCard } from './components';
 
 // Screens
-export { PaywallScreen } from './screens';
+export { PaywallScreen, ManageSubscriptionScreen } from './screens';
 
 // Constants
 export { FREE_TIER_LIMITS, PAYWALL_FEATURES, PRODUCT_IDS, ENTITLEMENT_ID } from './constants';

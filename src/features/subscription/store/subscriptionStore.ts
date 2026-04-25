@@ -41,6 +41,8 @@ interface SubscriptionActions {
   canGenerateReport: () => LimitCheckResult;
   /** Check if user can add a manual memory */
   canAddManualMemory: (currentMemoryCount: number) => LimitCheckResult;
+  /** Check if user can achieve a milestone */
+  canAchieveMilestone: (currentAchievedCount: number) => LimitCheckResult;
   /** Get formatted subscription info for display */
   getFormattedInfo: () => FormattedSubscriptionInfo;
   /** Check if subscription is expiring soon */
@@ -97,9 +99,10 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
 
       canAddChild: (currentChildCount) => {
         const { isPremium } = get();
+        const isEffectivelyPremium = isPremium && !get().hasExpired();
         const limit = FREE_TIER_LIMITS.maxChildren;
         
-        if (isPremium) {
+        if (isEffectivelyPremium) {
           return {
             allowed: true,
             currentCount: currentChildCount,
@@ -118,9 +121,10 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
 
       canGenerateReport: () => {
         const { isPremium, reportsGenerated } = get();
+        const isEffectivelyPremium = isPremium && !get().hasExpired();
         const limit = FREE_TIER_LIMITS.maxReports;
 
-        if (isPremium) {
+        if (isEffectivelyPremium) {
           return {
             allowed: true,
             currentCount: reportsGenerated,
@@ -139,9 +143,10 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
 
       canAddManualMemory: (currentMemoryCount) => {
         const { isPremium } = get();
+        const isEffectivelyPremium = isPremium && !get().hasExpired();
         const limit = FREE_TIER_LIMITS.maxManualMemories;
 
-        if (isPremium) {
+        if (isEffectivelyPremium) {
           return {
             allowed: true,
             currentCount: currentMemoryCount,
@@ -155,6 +160,28 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
           currentCount: currentMemoryCount,
           limit,
           featureName: 'memories',
+        };
+      },
+
+      canAchieveMilestone: (currentAchievedCount) => {
+        const { isPremium } = get();
+        const isEffectivelyPremium = isPremium && !get().hasExpired();
+        const limit = FREE_TIER_LIMITS.maxMilestoneAchievements;
+
+        if (isEffectivelyPremium) {
+          return {
+            allowed: true,
+            currentCount: currentAchievedCount,
+            limit: Infinity,
+            featureName: 'milestones',
+          };
+        }
+
+        return {
+          allowed: currentAchievedCount < limit,
+          currentCount: currentAchievedCount,
+          limit,
+          featureName: 'milestones',
         };
       },
 

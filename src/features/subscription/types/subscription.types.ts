@@ -95,6 +95,7 @@ export interface FreeTierLimits {
   maxChildren: number;
   maxReports: number;
   maxManualMemories: number;
+  maxMilestoneAchievements: number;
 }
 
 /**

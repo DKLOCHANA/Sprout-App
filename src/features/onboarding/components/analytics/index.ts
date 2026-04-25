@@ -1,11 +1,8 @@
 /**
  * Analytics Components Index
+ * 3 templates — one per onboarding question
  */
 
-export { PercentileChart } from './PercentileChart';
-export { ProgressBarAnalytics } from './ProgressBarAnalytics';
-export { CircleChart } from './CircleChart';
-export { BigNumber } from './BigNumber';
-export { Comparison } from './Comparison';
-export { SuccessRate } from './SuccessRate';
-export { Calendar } from './Calendar';
+export { HeroStatCard } from './HeroStatCard';
+export { TransformationCard } from './TransformationCard';
+export { SocialProofCard } from './SocialProofCard';

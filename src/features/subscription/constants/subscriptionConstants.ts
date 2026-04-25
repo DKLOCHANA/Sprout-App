@@ -12,6 +12,7 @@ export const FREE_TIER_LIMITS: FreeTierLimits = {
   maxChildren: 1,
   maxReports: 1,
   maxManualMemories: 3,
+  maxMilestoneAchievements: 3,
 } as const;
 
 /**

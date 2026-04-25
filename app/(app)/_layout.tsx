@@ -105,6 +105,12 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="manage-subscription"
+        options={{
+          href: null, // Hide from tab bar - accessed from Profile
+        }}
+      />
+      <Tabs.Screen
         name="babies"
         options={{
           title: 'PROFILE',

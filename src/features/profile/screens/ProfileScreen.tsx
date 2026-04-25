@@ -23,7 +23,6 @@ import {
 } from '../components';
 import { useProfileViewModel } from '../hooks/useProfileViewModel';
 import { usePdfReport } from '../hooks/usePdfReport';
-import { useSubscription } from '@/features/subscription';
 
 export function ProfileScreen() {
   const {
@@ -41,7 +40,6 @@ export function ProfileScreen() {
   } = useProfileViewModel();
 
   const { isGenerating, generateReport } = usePdfReport();
-  const { manageSubscription } = useSubscription();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -67,7 +65,7 @@ export function ProfileScreen() {
         />
 
         {/* Subscription Card */}
-        <SubscriptionCard onManageSubscription={manageSubscription} />
+        <SubscriptionCard />
 
         {/* Account Settings Section */}
         <SettingsSection title="Account Settings">

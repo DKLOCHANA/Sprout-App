@@ -11,6 +11,8 @@ import { Baby, GrowthEntry, BiologicalSex } from '../types';
 import { useAuthStore } from '@features/auth/store';
 import { babyService } from '@core/firebase';
 import { useSubscription } from '@/features/subscription';
+import { useUnitPreference } from '@shared/hooks';
+import { toKg, toCm } from '@shared/utils/unitConversions';
 
 interface FormErrors {
   name?: string;
@@ -26,6 +28,7 @@ export function useAddBabyViewModel() {
   const { user } = useAuthStore();
   const { addBabyWithInitialGrowth } = useBabyStore();
   const { checkCanAddChild } = useSubscription();
+  const { unitSystem } = useUnitPreference();
 
   // Form state
   const [name, setName] = useState('');
@@ -132,13 +135,14 @@ export function useAddBabyViewModel() {
         updatedAt: now,
       };
 
+      // Convert from selected unit system to metric for storage
       const growthEntry: GrowthEntry = {
         id: `growth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         babyId,
         date: new Date().toISOString().split('T')[0],
-        weightKg: weight ? Number(weight) : null,
-        heightCm: height ? Number(height) : null,
-        headCircumferenceCm: headCircumference ? Number(headCircumference) : null,
+        weightKg: weight ? toKg(Number(weight), unitSystem) : null,
+        heightCm: height ? toCm(Number(height), unitSystem) : null,
+        headCircumferenceCm: headCircumference ? toCm(Number(headCircumference), unitSystem) : null,
         notes: 'Initial measurement',
         createdAt: now,
         updatedAt: now,
@@ -172,6 +176,7 @@ export function useAddBabyViewModel() {
     weight,
     height,
     headCircumference,
+    unitSystem,
     addBabyWithInitialGrowth,
     checkCanAddChild,
   ]);

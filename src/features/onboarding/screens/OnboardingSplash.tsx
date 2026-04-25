@@ -4,10 +4,12 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Animated, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing, typography, radii } from '@core/theme';
+
+const APP_ICON = require('../../../../assets/icon.png');
 
 interface OnboardingSplashProps {
   onGetStarted: () => void;
@@ -83,16 +85,7 @@ export function OnboardingSplash({ onGetStarted }: OnboardingSplashProps) {
       <View style={styles.content}>
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <LinearGradient
-              colors={['#5B9FE3', '#3A7FC9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.logoGradient}
-            >
-              <MaterialCommunityIcons name="leaf" size={80} color="#FFFFFF" />
-            </LinearGradient>
-          </View>
+          <Image source={APP_ICON} style={styles.logoIcon} resizeMode="contain" />
         </View>
 
         {/* App Name */}
@@ -179,21 +172,15 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 32,
   },
-  logoCircle: {
+  logoIcon: {
     width: 140,
     height: 140,
-    borderRadius: 70,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    borderRadius: 32,
+    shadowColor: '#4A90D9',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 12,
-  },
-  logoGradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    shadowOpacity: 0.18,
+    shadowRadius: 20,
+    elevation: 10,
   },
   textContainer: {
     marginBottom: 16,

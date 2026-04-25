@@ -13,7 +13,6 @@ import {
   Platform,
 } from 'react-native';
 import { Image } from 'expo-image';
-import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii, shadows } from '@/core/theme';
 import type { MemoryDisplayData } from '../types';
@@ -27,32 +26,23 @@ interface MemoryCardProps {
 function MemoryCardComponent({ memory, isFirst, isLast }: MemoryCardProps) {
   const handleShare = useCallback(async () => {
     try {
-      const message = memory.notes
-        ? `${memory.title}\n\n${memory.notes}\n\nAchieved: ${memory.formattedDate}`
-        : `${memory.title}\n\nAchieved: ${memory.formattedDate}`;
+      const parts = [memory.title];
+      if (memory.description) parts.push(memory.description);
+      if (memory.notes) parts.push(memory.notes);
+      parts.push(`📅 ${memory.formattedDate}`);
+      const message = parts.join('\n\n');
 
-      // If there's a photo, share it along with the message
-      if (memory.photoUri) {
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
-          await Sharing.shareAsync(memory.photoUri, {
-            mimeType: 'image/jpeg',
-            dialogTitle: memory.title,
-          });
-        } else {
-          // Fallback to text-only sharing if image sharing not available
-          await Share.share({
-            message,
-            title: memory.title,
-          });
-        }
-      } else {
-        // No photo, share text only
-        await Share.share({
-          message,
-          title: memory.title,
-        });
+      const shareOptions: { message: string; title: string; url?: string } = {
+        message,
+        title: memory.title,
+      };
+
+      // On iOS, attach photo via url field so both text and image are shared
+      if (memory.photoUri && Platform.OS === 'ios') {
+        shareOptions.url = memory.photoUri;
       }
+
+      await Share.share(shareOptions);
     } catch {
       // User cancelled or error occurred
     }

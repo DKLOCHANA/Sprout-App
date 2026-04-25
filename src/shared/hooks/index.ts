@@ -9,3 +9,4 @@ export { useBabySwitcher } from './useBabySwitcher';
 export type { BabyDisplayInfo, UseBabySwitcherReturn } from './useBabySwitcher';
 export { useResponsiveAuth } from './useResponsiveAuth';
 export type { ResponsiveAuthStyles } from './useResponsiveAuth';
+export { useUnitPreference } from './useUnitPreference';

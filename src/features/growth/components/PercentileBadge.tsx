@@ -1,13 +1,15 @@
 /**
  * Percentile Badge Component
- * Displays percentile with color coding
+ * Displays percentile with colour coding.
+ * Tappable — opens PercentileInfoModal with a WHO-based explanation and colour guide.
  */
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing } from '@/core/theme';
 import { getPercentileCategory, PERCENTILE_RANGES } from '@/features/growth/types/growth.types';
 import type { ColorKey } from '@/core/theme';
+import { PercentileInfoModal } from './PercentileInfoModal';
 
 interface PercentileBadgeProps {
   percentile: number;
@@ -15,10 +17,11 @@ interface PercentileBadgeProps {
 }
 
 export function PercentileBadge({ percentile, size = 'medium' }: PercentileBadgeProps) {
+  const [modalVisible, setModalVisible] = useState(false);
+
   const category = getPercentileCategory(percentile);
   const config = PERCENTILE_RANGES[category];
-  
-  // Get actual color value from theme using the color key
+
   const colorKey = config.color as ColorKey;
   const colorValue = colors[colorKey];
 
@@ -35,23 +38,33 @@ export function PercentileBadge({ percentile, size = 'medium' }: PercentileBadge
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        sizeStyles[size],
-        { backgroundColor: `${colorValue}20` }, // 20 = 12.5% opacity in hex
-      ]}
-    >
-      <Text
+    <>
+      <TouchableOpacity
+        onPress={() => setModalVisible(true)}
+        activeOpacity={0.7}
         style={[
-          styles.text,
-          textSizeStyles[size],
-          { color: colorValue },
+          styles.container,
+          sizeStyles[size],
+          { backgroundColor: `${colorValue}20` },
         ]}
       >
-        {Math.round(percentile)}th Percentile
-      </Text>
-    </View>
+        <Text
+          style={[
+            styles.text,
+            textSizeStyles[size],
+            { color: colorValue },
+          ]}
+        >
+          {Math.round(percentile)}th Percentile ⓘ
+        </Text>
+      </TouchableOpacity>
+
+      <PercentileInfoModal
+        visible={modalVisible}
+        percentile={percentile}
+        onClose={() => setModalVisible(false)}
+      />
+    </>
   );
 }
 
