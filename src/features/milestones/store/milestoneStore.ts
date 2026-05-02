@@ -169,6 +169,12 @@ export const useMilestoneStore = create<MilestoneStore>()(
     {
       name: 'milestone-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      // v2: Migrated to new CDC milestones (data.txt). Old IDs no longer exist —
+      // wiping local achievements ensures the UI doesn't show orphaned data.
+      version: 2,
+      migrate: (_persistedState, _version) => ({
+        ...initialState,
+      }),
       partialize: (state) => ({
         achievements: state.achievements,
         hasSeenLegend: state.hasSeenLegend,

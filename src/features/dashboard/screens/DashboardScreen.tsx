@@ -17,6 +17,7 @@ import {
   UpNextCard,
   QuickActions,
 } from '../components';
+import { setPendingMilestoneCategory } from '@/features/milestones';
 
 export function DashboardScreen() {
   const router = useRouter();
@@ -33,6 +34,9 @@ export function DashboardScreen() {
 
   const { babiesForDisplay } = useBabySwitcher();
 
+  // Get first up next milestone
+  const primaryMilestone = upNextMilestones[0];
+
   // Navigation handlers
   const handleLogGrowth = useCallback(() => {
     router.push('/growth');
@@ -43,8 +47,11 @@ export function DashboardScreen() {
   }, [router]);
 
   const handleMilestonePress = useCallback(() => {
+    if (primaryMilestone?.category) {
+      setPendingMilestoneCategory(primaryMilestone.category);
+    }
     router.push('/milestones');
-  }, [router]);
+  }, [router, primaryMilestone]);
 
   const handleSleepChartPress = useCallback(() => {
     setSleepModalVisible(true);
@@ -62,9 +69,6 @@ export function DashboardScreen() {
     setBabySelectorVisible(false);
     router.push('/add-baby');
   }, [router]);
-
-  // Get first up next milestone
-  const primaryMilestone = upNextMilestones[0];
 
   // Show empty state if no baby selected
   if (!baby) {

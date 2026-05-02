@@ -35,29 +35,30 @@ export function MilestoneLegendModal({
           {/* Title */}
           <Text style={styles.title}>How to track milestones</Text>
 
+          <Text style={styles.subtitle}>
+            Tap the circle to mark a milestone as achieved. Tap again to undo.
+          </Text>
+
           {/* Legend Items */}
           <View style={styles.legendItems}>
             <View style={styles.legendItem}>
               <View style={[styles.statusButton, styles.statusNotYet]}>
                 <View style={styles.circleEmpty} />
               </View>
-              <Text style={styles.legendText}>Not yet</Text>
-            </View>
-
-            <View style={styles.legendItem}>
-              <View style={[styles.statusButton, styles.statusInProgress]}>
-                <View style={styles.circleFilled} />
-              </View>
-              <Text style={styles.legendText}>In progress</Text>
+              <Text style={styles.legendText}>Not yet achieved</Text>
             </View>
 
             <View style={styles.legendItem}>
               <View style={[styles.statusButton, styles.statusAchieved]}>
                 <Ionicons name="checkmark" size={14} color={colors.textOnPrimary} />
               </View>
-              <Text style={styles.legendText}>Achieved</Text>
+              <Text style={styles.legendText}>Achieved 🎉</Text>
             </View>
           </View>
+
+          <Text style={styles.note}>
+            Every child develops at their own pace. Don't worry if a milestone hasn't happened yet.
+          </Text>
 
           {/* Got it button */}
           <Pressable style={styles.button} onPress={onClose}>
@@ -88,12 +89,26 @@ const styles = StyleSheet.create({
   title: {
     ...typography.h3,
     color: colors.textPrimary,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
     textAlign: 'center',
+  },
+  subtitle: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+    lineHeight: 20,
+  },
+  note: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginBottom: spacing.lg,
   },
   legendItems: {
     gap: spacing.md,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   legendItem: {
     flexDirection: 'row',
@@ -112,10 +127,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: colors.border,
   },
-  statusInProgress: {
-    backgroundColor: 'transparent',
-    borderColor: colors.textMuted,
-  },
   statusAchieved: {
     backgroundColor: colors.secondary,
     borderColor: colors.secondary,
@@ -123,12 +134,6 @@ const styles = StyleSheet.create({
   circleEmpty: {
     width: 0,
     height: 0,
-  },
-  circleFilled: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.secondary,
   },
   legendText: {
     ...typography.body,

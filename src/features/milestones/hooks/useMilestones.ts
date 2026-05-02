@@ -25,14 +25,54 @@ interface UseMilestonesOptions {
 }
 
 const AGE_BLOCKS: AgeBlock[] = [
-  { label: '0-2 Months', value: 'current', minMonths: 0, maxMonths: 2 },
-  { label: '2-4 Months', value: 'current', minMonths: 2, maxMonths: 4 },
-  { label: '4-6 Months', value: 'current', minMonths: 4, maxMonths: 6 },
-  { label: '6-9 Months', value: 'current', minMonths: 6, maxMonths: 9 },
-  { label: '9-12 Months', value: 'current', minMonths: 9, maxMonths: 12 },
-  { label: '12-18 Months', value: 'current', minMonths: 12, maxMonths: 18 },
-  { label: '18-24 Months', value: 'current', minMonths: 18, maxMonths: 24 },
+  { label: 'By 2 Months',  value: 'current', minMonths: 0,  maxMonths: 2 },
+  { label: 'By 4 Months',  value: 'current', minMonths: 2,  maxMonths: 4 },
+  { label: 'By 6 Months',  value: 'current', minMonths: 4,  maxMonths: 6 },
+  { label: 'By 9 Months',  value: 'current', minMonths: 6,  maxMonths: 9 },
+  { label: 'By 1 Year',    value: 'current', minMonths: 9,  maxMonths: 12 },
+  { label: 'By 15 Months', value: 'current', minMonths: 12, maxMonths: 15 },
+  { label: 'By 18 Months', value: 'current', minMonths: 15, maxMonths: 18 },
+  { label: 'By 2 Years',   value: 'current', minMonths: 18, maxMonths: 24 },
 ];
+
+/** Time-period sections matching the CDC data.txt layout */
+export interface TimePeriodSection {
+  key: string;
+  label: string;
+  maxMonths: number;
+  categories: {
+    category: string;
+    milestones: Milestone[];
+  }[];
+}
+
+const PERIOD_ORDER = [2, 4, 6, 9, 12, 15, 18, 24];
+const PERIOD_LABELS: Record<number, string> = {
+  2: 'By 2 Months',
+  4: 'By 4 Months',
+  6: 'By 6 Months',
+  9: 'By 9 Months',
+  12: 'By 1 Year',
+  15: 'By 15 Months',
+  18: 'By 18 Months',
+  24: 'By 2 Years',
+};
+
+const CATEGORY_DISPLAY_ORDER = [
+  'Social-Emotional',
+  'Communication',
+  'Learning',
+  'Gross Motor',
+  'Fine Motor',
+];
+
+const SUBCATEGORY_LABELS: Record<string, string> = {
+  'Social-Emotional': 'Social / Emotional',
+  'Communication': 'Language / Communication',
+  'Learning': 'Cognitive',
+  'Gross Motor': 'Movement / Physical Development',
+  'Fine Motor': 'Movement / Physical Development',
+};
 
 export function useMilestones(options: UseMilestonesOptions = {}) {
   const { category, ageFilter = 'current', searchQuery = '' } = options;
@@ -196,6 +236,50 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
     [currentAgeLabel]
   );
 
+  // Group ALL milestones by time period → subcategory, matching data.txt structure
+  const groupedByTimePeriod: TimePeriodSection[] = useMemo(() => {
+    return PERIOD_ORDER.map((maxMo) => {
+      const periodMilestones = allMilestones.filter(
+        (m) => m.ageRangeMonths.max === maxMo
+      );
+
+      // Group by subcategory, merging Gross/Fine Motor under one heading
+      const catMap = new Map<string, Milestone[]>();
+      for (const m of periodMilestones) {
+        const displayKey =
+          m.subcategory === 'Fine Motor' || m.subcategory === 'Gross Motor'
+            ? 'Movement'
+            : m.subcategory;
+        if (!catMap.has(displayKey)) catMap.set(displayKey, []);
+        catMap.get(displayKey)!.push(m);
+      }
+
+      // Sort categories in the same order as data.txt
+      const orderedKeys = [
+        'Social-Emotional',
+        'Communication',
+        'Learning',
+        'Movement',
+      ];
+      const categories = orderedKeys
+        .filter((k) => catMap.has(k))
+        .map((k) => ({
+          category:
+            k === 'Movement'
+              ? 'Movement / Physical Development'
+              : SUBCATEGORY_LABELS[k] ?? k,
+          milestones: catMap.get(k)!,
+        }));
+
+      return {
+        key: `period-${maxMo}`,
+        label: PERIOD_LABELS[maxMo] ?? `By ${maxMo} Months`,
+        maxMonths: maxMo,
+        categories,
+      };
+    }).filter((s) => s.categories.length > 0);
+  }, [allMilestones]);
+
   return {
     milestones: filteredMilestones,
     allMilestones,
@@ -210,6 +294,7 @@ export function useMilestones(options: UseMilestonesOptions = {}) {
     nurtureFocusContent,
     relevantNurtureFocus,
     ageFilterOptions,
+    groupedByTimePeriod,
     baby,
     hasSeenLegend,
     setHasSeenLegend,

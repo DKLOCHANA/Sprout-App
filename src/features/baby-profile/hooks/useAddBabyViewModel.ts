@@ -11,8 +11,6 @@ import { Baby, GrowthEntry, BiologicalSex } from '../types';
 import { useAuthStore } from '@features/auth/store';
 import { babyService } from '@core/firebase';
 import { useSubscription } from '@/features/subscription';
-import { useUnitPreference } from '@shared/hooks';
-import { toKg, toCm } from '@shared/utils/unitConversions';
 
 interface FormErrors {
   name?: string;
@@ -21,22 +19,25 @@ interface FormErrors {
   weight?: string;
   height?: string;
   headCircumference?: string;
-  originalDueDate?: string;
+}
+
+const MAX_AGE_DAYS = 730; // 2 years
+
+function differenceInDays(later: Date, earlier: Date): number {
+  const ms = later.getTime() - earlier.getTime();
+  return Math.floor(ms / (1000 * 60 * 60 * 24));
 }
 
 export function useAddBabyViewModel() {
   const { user } = useAuthStore();
   const { addBabyWithInitialGrowth } = useBabyStore();
   const { checkCanAddChild } = useSubscription();
-  const { unitSystem } = useUnitPreference();
 
   // Form state
   const [name, setName] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [biologicalSex, setBiologicalSex] = useState<BiologicalSex | null>(null);
-  const [isPremature, setIsPremature] = useState(false);
-  const [originalDueDate, setOriginalDueDate] = useState(new Date());
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [headCircumference, setHeadCircumference] = useState('');
@@ -56,18 +57,21 @@ export function useAddBabyViewModel() {
     }
 
     // Date of birth should not be in the future
-    if (dateOfBirth > new Date()) {
+    const today = new Date();
+    if (dateOfBirth > today) {
       newErrors.dateOfBirth = 'Date of birth cannot be in the future';
+    } else {
+      // Sprout currently supports children up to 2 years old
+      const ageDays = differenceInDays(today, dateOfBirth);
+      if (ageDays > MAX_AGE_DAYS) {
+        newErrors.dateOfBirth =
+          'Sprout currently supports children up to 2 years old. Please add a younger child.';
+      }
     }
 
     // Biological sex is required
     if (!biologicalSex) {
       newErrors.biologicalSex = 'Please select biological sex';
-    }
-
-    // If premature, original due date should be after date of birth
-    if (isPremature && originalDueDate <= dateOfBirth) {
-      newErrors.originalDueDate = 'Due date must be after birth date';
     }
 
     // Weight is required
@@ -93,7 +97,7 @@ export function useAddBabyViewModel() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [name, dateOfBirth, biologicalSex, isPremature, originalDueDate, weight, height, headCircumference]);
+  }, [name, dateOfBirth, biologicalSex, weight, height, headCircumference]);
 
   /**
    * Handle form submission
@@ -126,23 +130,19 @@ export function useAddBabyViewModel() {
         name: name.trim(),
         dateOfBirth: dateOfBirth.toISOString().split('T')[0],
         biologicalSex: biologicalSex as BiologicalSex,
-        isPremature,
-        originalDueDate: isPremature
-          ? originalDueDate.toISOString().split('T')[0]
-          : undefined,
+        isPremature: false,
         photoUri,
         createdAt: now,
         updatedAt: now,
       };
 
-      // Convert from selected unit system to metric for storage
       const growthEntry: GrowthEntry = {
         id: `growth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         babyId,
         date: new Date().toISOString().split('T')[0],
-        weightKg: weight ? toKg(Number(weight), unitSystem) : null,
-        heightCm: height ? toCm(Number(height), unitSystem) : null,
-        headCircumferenceCm: headCircumference ? toCm(Number(headCircumference), unitSystem) : null,
+        weightKg: weight ? Number(weight) : null,
+        heightCm: height ? Number(height) : null,
+        headCircumferenceCm: headCircumference ? Number(headCircumference) : null,
         notes: 'Initial measurement',
         createdAt: now,
         updatedAt: now,
@@ -171,12 +171,9 @@ export function useAddBabyViewModel() {
     photoUri,
     dateOfBirth,
     biologicalSex,
-    isPremature,
-    originalDueDate,
     weight,
     height,
     headCircumference,
-    unitSystem,
     addBabyWithInitialGrowth,
     checkCanAddChild,
   ]);
@@ -197,10 +194,6 @@ export function useAddBabyViewModel() {
     setDateOfBirth,
     biologicalSex,
     setBiologicalSex,
-    isPremature,
-    setIsPremature,
-    originalDueDate,
-    setOriginalDueDate,
     weight,
     setWeight,
     height,

@@ -9,8 +9,6 @@ import { useBabyStore } from '../store';
 import { Baby, GrowthEntry, BiologicalSex, BabyAge } from '../types';
 import { useAuthStore } from '@features/auth/store';
 import { babyService } from '@core/firebase';
-import { useUnitPreference } from '@shared/hooks';
-import { toKg, toCm } from '@shared/utils/unitConversions';
 
 interface FormErrors {
   name?: string;
@@ -19,20 +17,23 @@ interface FormErrors {
   weight?: string;
   height?: string;
   headCircumference?: string;
-  originalDueDate?: string;
+}
+
+const MAX_AGE_DAYS = 730; // 2 years
+
+function differenceInDays(later: Date, earlier: Date): number {
+  const ms = later.getTime() - earlier.getTime();
+  return Math.floor(ms / (1000 * 60 * 60 * 24));
 }
 
 export function useBabySetupViewModel() {
   const { user, setOnboardingComplete } = useAuthStore();
   const { addBabyWithInitialGrowth } = useBabyStore();
-  const { unitSystem } = useUnitPreference();
 
   // Form state
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [biologicalSex, setBiologicalSex] = useState<BiologicalSex | null>(null);
-  const [isPremature, setIsPremature] = useState(false);
-  const [originalDueDate, setOriginalDueDate] = useState(new Date());
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [headCircumference, setHeadCircumference] = useState('');
@@ -40,36 +41,17 @@ export function useBabySetupViewModel() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /**
-   * Calculate baby's age from date of birth
-   */
-  const calculateAge = (dob: Date, adjustedDob?: Date): BabyAge => {
+  const calculateAge = (dob: Date): BabyAge => {
     const now = new Date();
     const birthDate = new Date(dob);
-    
-    // Calculate chronological age
+
     const diffMs = now.getTime() - birthDate.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const weeks = Math.floor(days / 7);
-    const months = Math.floor(days / 30.44); // Average days per month
+    const months = Math.floor(days / 30.44);
     const years = Math.floor(days / 365.25);
 
-    const age: BabyAge = { days, weeks, months, years };
-
-    // If premature, calculate adjusted age
-    if (adjustedDob) {
-      const adjustedDate = new Date(adjustedDob);
-      const adjustedDiffMs = now.getTime() - adjustedDate.getTime();
-      const adjustedDays = Math.floor(adjustedDiffMs / (1000 * 60 * 60 * 24));
-      const adjustedWeeks = Math.floor(adjustedDays / 7);
-      const adjustedMonths = Math.floor(adjustedDays / 30.44);
-
-      age.adjustedDays = adjustedDays;
-      age.adjustedWeeks = adjustedWeeks;
-      age.adjustedMonths = adjustedMonths;
-    }
-
-    return age;
+    return { days, weeks, months, years };
   };
 
   /**
@@ -84,18 +66,21 @@ export function useBabySetupViewModel() {
     }
 
     // Date of birth should not be in the future
-    if (dateOfBirth > new Date()) {
+    const today = new Date();
+    if (dateOfBirth > today) {
       newErrors.dateOfBirth = 'Date of birth cannot be in the future';
+    } else {
+      // Sprout currently supports children up to 2 years old
+      const ageDays = differenceInDays(today, dateOfBirth);
+      if (ageDays > MAX_AGE_DAYS) {
+        newErrors.dateOfBirth =
+          'Sprout currently supports children up to 2 years old. Please add a younger child.';
+      }
     }
 
     // Biological sex is required
     if (!biologicalSex) {
       newErrors.biologicalSex = 'Please select biological sex';
-    }
-
-    // If premature, original due date should be after date of birth
-    if (isPremature && originalDueDate <= dateOfBirth) {
-      newErrors.originalDueDate = 'Due date must be after birth date';
     }
 
     // Weight is required
@@ -143,30 +128,25 @@ export function useBabySetupViewModel() {
       const now = new Date().toISOString();
       const babyId = `baby_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      // Create baby profile
       const baby: Baby = {
         id: babyId,
         userId: user.id,
         name: name.trim(),
         dateOfBirth: dateOfBirth.toISOString().split('T')[0],
         biologicalSex: biologicalSex as BiologicalSex,
-        isPremature,
-        originalDueDate: isPremature
-          ? originalDueDate.toISOString().split('T')[0]
-          : undefined,
+        isPremature: false,
         photoUri: null,
         createdAt: now,
         updatedAt: now,
       };
 
-      // Create initial growth entry (convert from selected unit system to metric for storage)
       const growthEntry: GrowthEntry = {
         id: `growth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         babyId,
         date: new Date().toISOString().split('T')[0],
-        weightKg: weight ? toKg(Number(weight), unitSystem) : null,
-        heightCm: height ? toCm(Number(height), unitSystem) : null,
-        headCircumferenceCm: headCircumference ? toCm(Number(headCircumference), unitSystem) : null,
+        weightKg: weight ? Number(weight) : null,
+        heightCm: height ? Number(height) : null,
+        headCircumferenceCm: headCircumference ? Number(headCircumference) : null,
         notes: 'Initial baseline measurement',
         createdAt: now,
         updatedAt: now,
@@ -201,10 +181,6 @@ export function useBabySetupViewModel() {
     setDateOfBirth,
     biologicalSex,
     setBiologicalSex,
-    isPremature,
-    setIsPremature,
-    originalDueDate,
-    setOriginalDueDate,
     weight,
     setWeight,
     height,

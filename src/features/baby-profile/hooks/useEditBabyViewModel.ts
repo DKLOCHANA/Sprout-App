@@ -14,7 +14,6 @@ import { babyService } from '@core/firebase';
 interface FormErrors {
   name?: string;
   dateOfBirth?: string;
-  originalDueDate?: string;
 }
 
 export function useEditBabyViewModel() {
@@ -29,8 +28,6 @@ export function useEditBabyViewModel() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [biologicalSex, setBiologicalSex] = useState<BiologicalSex>('male');
-  const [isPremature, setIsPremature] = useState(false);
-  const [originalDueDate, setOriginalDueDate] = useState(new Date());
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,10 +40,6 @@ export function useEditBabyViewModel() {
       setPhotoUri(baby.photoUri);
       setDateOfBirth(new Date(baby.dateOfBirth));
       setBiologicalSex(baby.biologicalSex);
-      setIsPremature(baby.isPremature);
-      if (baby.originalDueDate) {
-        setOriginalDueDate(new Date(baby.originalDueDate));
-      }
       setIsLoading(false);
     } else if (id) {
       // Baby not found
@@ -70,13 +63,9 @@ export function useEditBabyViewModel() {
       newErrors.dateOfBirth = 'Date of birth cannot be in the future';
     }
 
-    if (isPremature && originalDueDate <= dateOfBirth) {
-      newErrors.originalDueDate = 'Due date must be after birth date';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [name, dateOfBirth, isPremature, originalDueDate]);
+  }, [name, dateOfBirth]);
 
   /**
    * Handle form submission
@@ -99,10 +88,7 @@ export function useEditBabyViewModel() {
         photoUri,
         dateOfBirth: dateOfBirth.toISOString().split('T')[0],
         biologicalSex,
-        isPremature,
-        originalDueDate: isPremature
-          ? originalDueDate.toISOString().split('T')[0]
-          : undefined,
+        isPremature: false,
       };
 
       // Update locally
@@ -130,8 +116,6 @@ export function useEditBabyViewModel() {
     photoUri,
     dateOfBirth,
     biologicalSex,
-    isPremature,
-    originalDueDate,
     updateBaby,
   ]);
 
@@ -153,10 +137,6 @@ export function useEditBabyViewModel() {
     setDateOfBirth,
     biologicalSex,
     setBiologicalSex,
-    isPremature,
-    setIsPremature,
-    originalDueDate,
-    setOriginalDueDate,
     errors,
     isSubmitting,
     handleSubmit,

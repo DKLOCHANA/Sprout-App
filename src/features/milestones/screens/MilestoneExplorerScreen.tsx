@@ -3,7 +3,7 @@
  * Main screen for exploring and tracking developmental milestones
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,14 +14,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, radii } from '@/core/theme';
-import { EmptyState } from '@/shared/components';
+import { EmptyState, InfoBanner, CelebrationBurst } from '@/shared/components';
+import type { CelebrationBurstHandle } from '@/shared/components';
 import { CategoryTabs } from '../components/CategoryTabs';
 import { AgeFilterDropdown } from '../components/AgeFilterDropdown';
 import { MilestoneCard } from '../components/MilestoneCard';
 import { MilestoneLegendModal } from '../components/MilestoneLegendModal';
 import { useMilestones } from '../hooks';
+import { consumePendingMilestoneCategory } from '../navigationIntent';
 import type { MilestoneCategory, AgeFilterType, MilestoneStatus } from '../types';
 
 export function MilestoneExplorerScreen() {
@@ -30,6 +33,20 @@ export function MilestoneExplorerScreen() {
   const [selectedAgeFilter, setSelectedAgeFilter] = useState<AgeFilterType>('current');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLegendVisible, setIsLegendVisible] = useState(false);
+  const celebrationRef = useRef<CelebrationBurstHandle>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      const pending = consumePendingMilestoneCategory();
+      if (pending) {
+        setSelectedCategory(pending);
+      }
+    }, [])
+  );
+
+  const handleCelebrate = useCallback((x: number, y: number) => {
+    celebrationRef.current?.play(x, y);
+  }, []);
 
   const {
     milestones,
@@ -142,9 +159,18 @@ export function MilestoneExplorerScreen() {
                 milestone={milestone}
                 status={getMilestoneStatus(milestone.id)}
                 onStatusChange={(status) => handleStatusChange(milestone.id, status)}
+                onCelebrate={handleCelebrate}
               />
             ))
           )}
+        </View>
+
+        {/* Medical Disclaimer */}
+        <View style={styles.disclaimerWrapper}>
+          <InfoBanner
+            tone="disclaimer"
+            message="Every child develops at their own pace. These milestones are educational guidelines from the CDC, not medical advice. If you have concerns about your child's development, please consult your pediatrician."
+          />
         </View>
 
         {/* Bottom padding for tab bar */}
@@ -156,6 +182,9 @@ export function MilestoneExplorerScreen() {
         visible={isLegendVisible}
         onClose={handleLegendClose}
       />
+
+      {/* Celebration overlay */}
+      <CelebrationBurst ref={celebrationRef} />
     </SafeAreaView>
   );
 }
@@ -201,6 +230,10 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textMuted,
     textAlign: 'center',
+  },
+  disclaimerWrapper: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
   },
   bottomPadding: {
     height: spacing['2xl'],

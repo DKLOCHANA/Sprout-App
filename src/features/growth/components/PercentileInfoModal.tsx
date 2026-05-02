@@ -86,15 +86,40 @@ const LEGEND_ROWS: {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+type MetricType = 'weight' | 'height' | 'headCircumference';
+
+const METRIC_LABELS: Record<MetricType, string> = {
+  weight: 'Weight',
+  height: 'Height',
+  headCircumference: 'Head Circumference',
+};
+
 interface PercentileInfoModalProps {
   visible: boolean;
   percentile: number;
+  metric?: MetricType;
+  measurement?: number;
+  unit?: string;
   onClose: () => void;
+}
+
+function ordinalSuffix(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return 'th';
+  switch (n % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
 }
 
 export function PercentileInfoModal({
   visible,
   percentile,
+  metric,
+  measurement,
+  unit,
   onClose,
 }: PercentileInfoModalProps) {
   const { width, height } = useWindowDimensions();
@@ -133,13 +158,30 @@ export function PercentileInfoModal({
 
           {/* Header */}
           <View style={styles.header}>
-            <View style={[styles.percentilePill, { backgroundColor: `${accentColor}18` }]}>
-              <Text style={[styles.percentileValue, { color: accentColor }]}>
-                {Math.round(percentile)}th
-              </Text>
-              <Text style={[styles.percentileLabel, { color: accentColor }]}>
-                {' '}Percentile
-              </Text>
+            <View style={styles.headerLeft}>
+              {metric && (
+                <Text style={styles.metricLabel}>
+                  {METRIC_LABELS[metric]}
+                </Text>
+              )}
+              <View style={[styles.percentilePill, { backgroundColor: `${accentColor}18` }]}>
+                <Text style={[styles.percentileValue, { color: accentColor }]}>
+                  {Math.round(percentile)}
+                  <Text style={[styles.percentileOrdinal, { color: accentColor }]}>
+                    {ordinalSuffix(Math.round(percentile))}
+                  </Text>
+                </Text>
+                <Text style={[styles.percentileLabel, { color: accentColor }]}>
+                  {' '}Percentile
+                </Text>
+              </View>
+              {measurement !== undefined && measurement !== null && (
+                <Text style={styles.measurementText}>
+                  Current: <Text style={styles.measurementValue}>
+                    {measurement.toFixed(measurement >= 10 ? 1 : 2)} {unit}
+                  </Text>
+                </Text>
+              )}
             </View>
             <Pressable onPress={onClose} style={styles.closeButton} hitSlop={12}>
               <Ionicons name="close" size={20} color={colors.textSecondary} />
@@ -263,22 +305,47 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xs,
     paddingBottom: spacing.sm,
   },
+  headerLeft: {
+    flex: 1,
+    gap: 6,
+  },
+  metricLabel: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
   percentilePill: {
     flexDirection: 'row',
     alignItems: 'baseline',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: 20,
+    alignSelf: 'flex-start',
   },
   percentileValue: {
     ...typography.h2,
     fontWeight: '700',
     fontSize: 22,
   },
+  percentileOrdinal: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
   percentileLabel: {
     ...typography.body,
     fontWeight: '600',
     fontSize: 14,
+  },
+  measurementText: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  measurementValue: {
+    color: colors.textPrimary,
+    fontWeight: '700',
   },
   closeButton: {
     width: 32,

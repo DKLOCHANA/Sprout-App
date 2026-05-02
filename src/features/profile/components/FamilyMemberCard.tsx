@@ -88,11 +88,6 @@ export function FamilyMemberCard({
                 {baby.biologicalSex === 'male' ? 'Boy' : 'Girl'}
               </Text>
             </View>
-            {baby.isPremature && (
-              <View style={styles.prematureBadge}>
-                <Text style={styles.prematureText}>Premature</Text>
-              </View>
-            )}
           </View>
         </View>
 
@@ -211,17 +206,6 @@ const styles = StyleSheet.create({
   },
   genderText: {
     ...typography.caption,
-    fontWeight: '500',
-  },
-  prematureBadge: {
-    backgroundColor: colors.warningDim,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radii.sm,
-  },
-  prematureText: {
-    ...typography.caption,
-    color: colors.textSecondary,
     fontWeight: '500',
   },
   actionsContainer: {

@@ -20,7 +20,7 @@ import { useBabyStore } from '@/features/baby-profile/store';
 import { useAuthStore } from '@/features/auth/store';
 import { useGrowthAnalysis } from '@/shared/hooks';
 import { GrowthChart } from '@/shared/components/charts';
-import { EmptyState } from '@/shared/components';
+import { EmptyState, InfoBanner } from '@/shared/components';
 import { AlertBanner } from '../components/AlertBanner';
 import { PercentileBadge } from '../components/PercentileBadge';
 import { MetricCard } from '../components/MetricCard';
@@ -49,6 +49,17 @@ export function GrowthScreen() {
   const selectedPercentile = latestPercentiles
     ? latestPercentiles[selectedMetric]
     : undefined;
+
+  // Latest measurement value for the selected metric (passed to modal)
+  const selectedMeasurement = latestEntry
+    ? selectedMetric === 'weight'
+      ? latestEntry.weightKg
+      : selectedMetric === 'height'
+      ? latestEntry.heightCm
+      : latestEntry.headCircumferenceCm
+    : null;
+
+  const selectedUnit = selectedMetric === 'weight' ? 'kg' : 'cm';
 
   const chartHeight = Math.max(220, screenHeight * 0.42);
 
@@ -144,6 +155,9 @@ export function GrowthScreen() {
             <View style={styles.chartPercentileBadgeContainer}>
               <PercentileBadge
                 percentile={selectedPercentile}
+                metric={selectedMetric}
+                measurement={selectedMeasurement ?? undefined}
+                unit={selectedUnit}
                 size="large"
               />
             </View>
@@ -213,6 +227,13 @@ export function GrowthScreen() {
             <Text style={styles.addButtonTitle}>New Entry</Text>
           </Pressable>
         </View>
+
+        {/* Medical Disclaimer */}
+        <InfoBanner
+          tone="disclaimer"
+          message="Growth percentiles are based on WHO Child Growth Standards and are intended as a tracking tool only. They do not constitute medical advice. Always consult your pediatrician for any concerns about your child's growth or development."
+          style={styles.disclaimerBanner}
+        />
 
         {/* DEV: Generate Test Data */}
         {__DEV__ && (
@@ -343,6 +364,9 @@ const styles = StyleSheet.create({
   },
   addButtonContainer: {
     paddingTop: spacing.md,
+  },
+  disclaimerBanner: {
+    marginTop: spacing.lg,
   },
   addButton: {
     width: '100%',

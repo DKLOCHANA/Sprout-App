@@ -21,7 +21,6 @@ import {
   Input,
   DatePicker,
   Toggle,
-  Switch,
   PrimaryButton,
   ImagePicker,
 } from '@shared/components/ui';
@@ -39,10 +38,6 @@ export function EditBabyScreen() {
     setDateOfBirth,
     biologicalSex,
     setBiologicalSex,
-    isPremature,
-    setIsPremature,
-    originalDueDate,
-    setOriginalDueDate,
     errors,
     isSubmitting,
     handleSubmit,
@@ -125,25 +120,6 @@ export function EditBabyScreen() {
             value={biologicalSex}
             onChange={setBiologicalSex}
           />
-
-          {/* Prematurity Toggle */}
-          <Switch
-            label="Born before 37 weeks?"
-            description="Adjusts development milestones"
-            value={isPremature}
-            onChange={setIsPremature}
-          />
-
-          {/* Original Due Date (if premature) */}
-          {isPremature && (
-            <DatePicker
-              label="ORIGINAL DUE DATE"
-              value={originalDueDate}
-              onChange={setOriginalDueDate}
-              minimumDate={dateOfBirth}
-              error={errors.originalDueDate}
-            />
-          )}
 
           {/* Submit Button */}
           <PrimaryButton

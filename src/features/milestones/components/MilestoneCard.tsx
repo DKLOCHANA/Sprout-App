@@ -1,11 +1,22 @@
 /**
  * MilestoneCard
- * Card component displaying a milestone with status toggles
+ * Card with a single "Achieved" checkbox.
+ * Tapping toggles between not_yet ↔ achieved with haptic feedback +
+ * an optional onCelebrate callback when newly completed (so the parent
+ * can position a particle burst at the checkbox location).
  */
 
-import React, { useCallback, memo } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useCallback, memo, useRef } from 'react';
+import { View, Text, Pressable, StyleSheet, findNodeHandle, UIManager } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors, typography, spacing, radii, shadows } from '@/core/theme';
 import type { Milestone, MilestoneStatus } from '../types';
 
@@ -13,110 +24,89 @@ interface MilestoneCardProps {
   milestone: Milestone;
   status: MilestoneStatus;
   onStatusChange: (status: MilestoneStatus) => void;
-}
-
-interface StatusButtonProps {
-  type: MilestoneStatus;
-  isActive: boolean;
-  onPress: () => void;
-}
-
-function StatusButton({ type, isActive, onPress }: StatusButtonProps) {
-  const getButtonStyle = () => {
-    switch (type) {
-      case 'not_yet':
-        return {
-          container: isActive ? styles.statusNotYetActive : styles.statusNotYet,
-        };
-      case 'in_progress':
-        return {
-          container: isActive ? styles.statusInProgressActive : styles.statusInProgress,
-        };
-      case 'achieved':
-        return {
-          container: isActive ? styles.statusAchievedActive : styles.statusAchieved,
-        };
-    }
-  };
-
-  const buttonStyle = getButtonStyle();
-
-  const renderIcon = () => {
-    if (type === 'achieved') {
-      return (
-        <Ionicons
-          name="checkmark"
-          size={18}
-          color={isActive ? colors.textOnPrimary : colors.textMuted}
-        />
-      );
-    }
-    // For not_yet and in_progress, render a circle
-    return (
-      <View
-        style={[
-          styles.circleInner,
-          type === 'in_progress' && isActive && styles.circleInnerFilled,
-          type === 'in_progress' && !isActive && styles.circleInnerMuted,
-        ]}
-      />
-    );
-  };
-
-  return (
-    <Pressable
-      style={[styles.statusButton, buttonStyle.container]}
-      onPress={onPress}
-    >
-      {renderIcon()}
-    </Pressable>
-  );
+  onCelebrate?: (originX: number, originY: number) => void;
 }
 
 function MilestoneCardComponent({
   milestone,
   status,
   onStatusChange,
+  onCelebrate,
 }: MilestoneCardProps) {
-  const handleStatusPress = useCallback(
-    (newStatus: MilestoneStatus) => {
-      onStatusChange(newStatus);
-    },
-    [onStatusChange]
-  );
+  const checkboxRef = useRef<View>(null);
+  const isAchieved = status === 'achieved';
 
-  const getSubcategoryLabel = () => {
-    return milestone.subcategory.toUpperCase();
-  };
+  const scale = useSharedValue(1);
+  const checkScale = useSharedValue(isAchieved ? 1 : 0);
+
+  // Keep check icon scale in sync if status changes externally
+  React.useEffect(() => {
+    checkScale.value = withSpring(isAchieved ? 1 : 0, {
+      damping: 12,
+      stiffness: 220,
+    });
+  }, [isAchieved, checkScale]);
+
+  const handlePress = useCallback(() => {
+    const willComplete = !isAchieved;
+    const newStatus: MilestoneStatus = willComplete ? 'achieved' : 'not_yet';
+
+    // Bouncy press animation
+    scale.value = withSequence(
+      withTiming(0.85, { duration: 90 }),
+      withSpring(1, { damping: 6, stiffness: 220 })
+    );
+
+    if (willComplete) {
+      // Haptic + celebration
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+
+      if (onCelebrate && checkboxRef.current) {
+        const handle = findNodeHandle(checkboxRef.current);
+        if (handle) {
+          UIManager.measureInWindow(handle, (x, y, width, height) => {
+            onCelebrate(x + width / 2, y + height / 2);
+          });
+        }
+      }
+    } else {
+      // Lighter haptic when un-completing
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+
+    onStatusChange(newStatus);
+  }, [isAchieved, onStatusChange, onCelebrate, scale]);
+
+  const containerAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const checkAnimStyle = useAnimatedStyle(() => ({
+    opacity: checkScale.value,
+    transform: [{ scale: checkScale.value }],
+  }));
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, containerAnimStyle]}>
       <View style={styles.content}>
-        <Text style={styles.subcategory}>{getSubcategoryLabel()}</Text>
+        <Text style={styles.subcategory}>{milestone.subcategory.toUpperCase()}</Text>
         <Text style={styles.title}>{milestone.title}</Text>
       </View>
-      <View style={styles.statusContainer}>
-        <StatusButton
-          type="not_yet"
-          isActive={status === 'not_yet'}
-          onPress={() => handleStatusPress('not_yet')}
-        />
-        <StatusButton
-          type="in_progress"
-          isActive={status === 'in_progress'}
-          onPress={() => handleStatusPress('in_progress')}
-        />
-        <StatusButton
-          type="achieved"
-          isActive={status === 'achieved'}
-          onPress={() => handleStatusPress('achieved')}
-        />
-      </View>
-    </View>
+
+      <Pressable
+        ref={checkboxRef}
+        onPress={handlePress}
+        hitSlop={8}
+        style={[styles.checkbox, isAchieved && styles.checkboxActive]}
+      >
+        <Animated.View style={checkAnimStyle}>
+          <Ionicons name="checkmark" size={20} color={colors.textOnPrimary} />
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
   );
 }
 
-// Wrap with React.memo for performance in lists
 export const MilestoneCard = memo(MilestoneCardComponent);
 
 const styles = StyleSheet.create({
@@ -146,56 +136,17 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: '500',
   },
-  statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  statusButton: {
+  checkbox: {
     width: 36,
     height: 36,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-  },
-  circleInner: {
-    width: 0,
-    height: 0,
-  },
-  circleInnerFilled: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.secondary,
-  },
-  circleInnerMuted: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.textMuted,
-  },
-  statusNotYet: {
-    backgroundColor: 'transparent',
     borderColor: colors.border,
-  },
-  statusNotYetActive: {
     backgroundColor: 'transparent',
-    borderColor: colors.textSecondary,
   },
-  statusInProgress: {
-    backgroundColor: 'transparent',
-    borderColor: colors.border,
-  },
-  statusInProgressActive: {
-    backgroundColor: 'transparent',
-    borderColor: colors.textMuted,
-  },
-  statusAchieved: {
-    backgroundColor: 'transparent',
-    borderColor: colors.border,
-  },
-  statusAchievedActive: {
+  checkboxActive: {
     backgroundColor: colors.secondary,
     borderColor: colors.secondary,
   },

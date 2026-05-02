@@ -21,13 +21,11 @@ import {
   Input,
   DatePicker,
   Toggle,
-  Switch,
   MeasurementInput,
   PrimaryButton,
   ImagePicker,
 } from '@shared/components/ui';
-import { useUnitPreference } from '@shared/hooks';
-import { unitLabels, unitPlaceholders } from '@shared/utils/unitConversions';
+import { InfoBanner } from '@shared/components';
 import { useAddBabyViewModel } from '../hooks';
 import { BiologicalSex } from '../types';
 
@@ -41,10 +39,6 @@ export function AddBabyScreen() {
     setDateOfBirth,
     biologicalSex,
     setBiologicalSex,
-    isPremature,
-    setIsPremature,
-    originalDueDate,
-    setOriginalDueDate,
     weight,
     setWeight,
     height,
@@ -56,10 +50,6 @@ export function AddBabyScreen() {
     handleSubmit,
     handleCancel,
   } = useAddBabyViewModel();
-
-  const { unitSystem, setUnitSystem } = useUnitPreference();
-  const weightUnit = unitLabels.weight(unitSystem);
-  const lengthUnit = unitLabels.length(unitSystem);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -88,6 +78,14 @@ export function AddBabyScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Eligibility Warning */}
+          <InfoBanner
+            tone="warning"
+            title="Before you add"
+            message="Sprout is designed for full-term babies (born around 37–42 weeks of pregnancy). WHO growth standards may not accurately reflect very preterm or post-term babies."
+            style={styles.eligibilityBanner}
+          />
+
           {/* Photo Picker */}
           <ImagePicker
             imageUri={photoUri}
@@ -128,95 +126,48 @@ export function AddBabyScreen() {
             error={errors.biologicalSex}
           />
 
-          {/* Prematurity Toggle */}
-          <Switch
-            label="Born before 37 weeks?"
-            description="Adjusts development milestones"
-            value={isPremature}
-            onChange={setIsPremature}
-          />
-
-          {/* Original Due Date (if premature) */}
-          {isPremature && (
-            <DatePicker
-              label="ORIGINAL DUE DATE"
-              value={originalDueDate}
-              onChange={setOriginalDueDate}
-              minimumDate={dateOfBirth}
-              error={errors.originalDueDate}
-            />
-          )}
-
           {/* Current Measurements */}
           <View style={styles.measurementHeader}>
             <Text style={styles.measurementSectionLabel}>
               CURRENT MEASUREMENTS
             </Text>
-            {/* Unit system toggle */}
-            <View style={styles.unitToggle}>
-              <Pressable
-                style={[
-                  styles.unitOption,
-                  unitSystem === 'metric' && styles.unitOptionActive,
-                ]}
-                onPress={() => setUnitSystem('metric')}
-              >
-                <Text
-                  style={[
-                    styles.unitOptionText,
-                    unitSystem === 'metric' && styles.unitOptionTextActive,
-                  ]}
-                >
-                  Metric
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.unitOption,
-                  unitSystem === 'standard' && styles.unitOptionActive,
-                ]}
-                onPress={() => setUnitSystem('standard')}
-              >
-                <Text
-                  style={[
-                    styles.unitOptionText,
-                    unitSystem === 'standard' && styles.unitOptionTextActive,
-                  ]}
-                >
-                  Standard
-                </Text>
-              </Pressable>
-            </View>
           </View>
 
           <View style={styles.measurementRow}>
             <MeasurementInput
               label="WEIGHT"
-              unit={weightUnit}
+              unit="kg"
               value={weight}
               onChangeText={setWeight}
-              placeholder={unitPlaceholders.weight(unitSystem)}
+              placeholder="e.g. 3.5"
               error={errors.weight}
             />
             <View style={{ width: spacing.md }} />
             <MeasurementInput
               label="HEIGHT"
-              unit={lengthUnit}
+              unit="cm"
               value={height}
               onChangeText={setHeight}
-              placeholder={unitPlaceholders.height(unitSystem)}
+              placeholder="e.g. 50"
               error={errors.height}
             />
             <View style={{ width: spacing.md }} />
             <MeasurementInput
               label="HEAD"
-              unit={lengthUnit}
+              unit="cm"
               value={headCircumference}
               onChangeText={setHeadCircumference}
-              placeholder={unitPlaceholders.head(unitSystem)}
+              placeholder="e.g. 35"
               error={errors.headCircumference}
             />
           </View>
+
+          {/* Medical Disclaimer */}
+          <InfoBanner
+            tone="disclaimer"
+            message="Sprout is for general tracking and educational purposes only. Always seek the guidance of a qualified healthcare professional for any concerns about your child's health or development."
+            style={styles.disclaimerBanner}
+          />
 
           {/* Submit Button */}
           <PrimaryButton
@@ -283,6 +234,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing['2xl'],
   },
+  eligibilityBanner: {
+    marginBottom: spacing.lg,
+  },
+  disclaimerBanner: {
+    marginTop: spacing.lg,
+  },
   // ─── Measurement section ────────────────────────────────────────────────────
   measurementHeader: {
     flexDirection: 'row',
@@ -301,32 +258,6 @@ const styles = StyleSheet.create({
   measurementRow: {
     flexDirection: 'row',
     marginBottom: spacing.lg,
-  },
-  // ─── Unit toggle ────────────────────────────────────────────────────────────
-  unitToggle: {
-    flexDirection: 'row',
-    backgroundColor: colors.inputBackground,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    overflow: 'hidden',
-  },
-  unitOption: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  unitOptionActive: {
-    backgroundColor: colors.secondary,
-  },
-  unitOptionText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  unitOptionTextActive: {
-    color: colors.textOnPrimary,
-    fontWeight: '600',
   },
   submitButton: {
     marginTop: spacing.xl,

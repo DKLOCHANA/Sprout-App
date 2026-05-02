@@ -17,7 +17,7 @@ export default {
       supportsTablet: true,
       bundleIdentifier: "com.sprout.babytracker",
       usesAppleSignIn: true,
-      buildNumber: "1",
+      buildNumber: "30",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false
       }
@@ -43,7 +43,7 @@ export default {
     ],
     extra: {
       eas: {
-        projectId: "01795e86-9f64-4f73-98c2-7f80ce7cfc1b"
+        projectId: "25233e56-8ad5-4867-a862-81edba763a32"
       },
       // Firebase configuration - read from environment variables
       firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
